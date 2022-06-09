@@ -1,17 +1,15 @@
 from setuptools import setup
 
 setup(
-    name='tripodcats-podcast-helper',
+    name='tripodcats-little-helper',
     version='0.1.0',    
     description='Tools ',
-    url='https://github.com/shuds13/pyexample',
-    author='Stephen Hudson',
-    author_email='shudson@anl.gov',
+    url='https://github.com/eufmike/tripodcats-little-helper',
+    author='Mike Shih',
+    author_email='m.cc.shih@gmail.com',
     license='BSD 2-clause',
-    packages=['pyexample'],
-    install_requires=['mpi4py>=2.0',
-                      'numpy',                     
-                      ],
+    packages=['tripodcats_little_helper'],
+    install_requires=['numpy'],
 
     classifiers=[
         'Development Status :: 1 - Planning',

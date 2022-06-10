@@ -1,8 +1,10 @@
 # Tripod Cats' Little Helper (tclh)
 
+## Installation
+
 1. pull this git repository
 2. move to the directory of tclh
-3. create conda env
+3. create conda environment
 
     ```bash
     conda create -n tclh python=3.9
@@ -22,3 +24,5 @@
     ```bash
     python .\example\wavdivider.py -i <input_dir> -o <output_dir> -c .\example\split_test.csv
     ```
+
+By changing the *.csv file, users can define timestamps for spliting wav files in the input directory. The timestamp format is HH:MM:SS.

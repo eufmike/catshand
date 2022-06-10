@@ -31,7 +31,9 @@ def main(ip_path, op_path, csv_path,
         fs_tmp, data_tmp = read(str(ipflpath))
         data_tmp = np.expand_dims(data_tmp, axis = 0)
         timestamp = df_split['timestamp']
+        # print(timestamp)
         arrayidx = [timestamp2arrayidx(x, fs_tmp) for x in timestamp]
+        # print(arrayidx)
         splitdata_list = wavcut(arrayidx, data_tmp)
         for idx, splitdata_tmp in enumerate(splitdata_list):
             opfilename = re.sub(filetype, f'_{str(idx + 1).zfill(2)}{filetype}', ipflpath.name)

@@ -1,16 +1,19 @@
-from setuptools import setup
+import setuptools
 
-setup(
-    name='tripodcats-little-helper',
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+    
+setuptools.setup(
+    name='tclh',
     version='0.1.0',    
     description='Tools ',
     url='https://github.com/eufmike/tripodcats-little-helper',
     author='Mike Shih',
     author_email='m.cc.shih@gmail.com',
     license='BSD 2-clause',
-    packages=['tripodcats_little_helper'],
     install_requires=['numpy'],
-
+    package_dir={"": "src"},
+    packages=setuptools.find_packages(where="src"),
     classifiers=[
         'Development Status :: 1 - Planning',
         'Intended Audience :: Science/Research',

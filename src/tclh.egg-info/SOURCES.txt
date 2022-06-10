@@ -1,0 +1,11 @@
+LICENSE
+README.md
+setup.py
+src/tclh/__init__.py
+src/tclh/_module.py
+src/tclh/utility.py
+src/tclh.egg-info/PKG-INFO
+src/tclh.egg-info/SOURCES.txt
+src/tclh.egg-info/dependency_links.txt
+src/tclh.egg-info/requires.txt
+src/tclh.egg-info/top_level.txt

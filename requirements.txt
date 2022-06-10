@@ -6,3 +6,5 @@ tqdm
 pydub
 matplotlib
 jupyterlab
+lxml
+fake_useragent

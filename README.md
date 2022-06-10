@@ -21,12 +21,11 @@
 
 ## Function
 
-**Current function only supports spliting files wav files with given time stamp.**
 
-### Example
+### 1. *.wav divider
 
 ```bash
-python .\example\wavdivider.py -i <input_dir> -o <output_dir> -c .\example\split_test.csv
+python .\tools\wavdivider.py -i <input_dir> -o <output_dir> -c .\tools\split_test.csv
 ```
 
 By changing the *.csv file, users can define timestamps for spliting wav files in the input directory. The timestamp format is HH:MM:SS.
@@ -36,3 +35,15 @@ By changing the *.csv file, users can define timestamps for spliting wav files i
 1. This code is designed for single channel signed 16-bit.
 
 2. Exported rates can be different between files, while output rate will be the same as input rate. 
+
+### 2. Podcast Url Parser
+
+```bash
+python .\tools\linkparser.py
+# return
+Export:
+Apple: https://tinyurl.com/2y3yp4xs
+Google: https://tinyurl.com/2ynkqvl4
+Spotify: https://tinyurl.com/29ms2asr
+Kkbox: https://tinyurl.com/2aae45g3
+```

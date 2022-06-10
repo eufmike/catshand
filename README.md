@@ -19,11 +19,15 @@
 
 5. Download test files from this [link](https://drive.google.com/drive/folders/1ZK2PGQHYUtQUZYW7GLx3O8Ukr5MvmnHe?usp=sharing)
 
-6. run the example
+## Function
 
-    ```bash
-    python .\example\wavdivider.py -i <input_dir> -o <output_dir> -c .\example\split_test.csv
-    ```
+**Current function only supports spliting files wav files with given time stamp.**
+
+### Example
+
+```bash
+python .\example\wavdivider.py -i <input_dir> -o <output_dir> -c .\example\split_test.csv
+```
 
 By changing the *.csv file, users can define timestamps for spliting wav files in the input directory. The timestamp format is HH:MM:SS.
 

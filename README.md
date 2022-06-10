@@ -27,7 +27,7 @@
 
 By changing the *.csv file, users can define timestamps for spliting wav files in the input directory. The timestamp format is HH:MM:SS.
 
-## Limitation
+## Notes
 
 1. This code is designed for single channel signed 16-bit.
 

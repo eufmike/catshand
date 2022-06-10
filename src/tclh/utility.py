@@ -3,12 +3,12 @@ def timestamp2arrayidx(timestamp, fs):
     hr = int(timestamp_list[0])
     min = int(timestamp_list[1])
     sec = int(timestamp_list[2])
-    #print(f'hr: {hr}, min:{min}, sec:{sec}')
+    # print(f'hr: {hr}, min:{min}, sec:{sec}')
     sec_total = hr*60*60 + min*60 + sec
     return sec_total * fs
 
 def wavcut(arrayidx_list_ip, wav_data):
-    #print(wav_data.shape)
+    # print(wav_data.shape)
     arrayidx_list = [0]
     arrayidx_list.extend(arrayidx_list_ip)
     

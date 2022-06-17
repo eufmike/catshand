@@ -4,10 +4,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
     
 setuptools.setup(
-    name='tclh',
+    name='catshand',
     version='0.1.0',    
     description='Tools ',
-    url='https://github.com/eufmike/tripodcats-little-helper',
+    url='https://github.com/eufmike/catshand',
     author='Mike Shih',
     author_email='m.cc.shih@gmail.com',
     license='BSD 2-clause',

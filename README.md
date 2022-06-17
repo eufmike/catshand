@@ -1,13 +1,15 @@
-# Tripod Cats' Little Helper (tclh)
+# Cat's Hand (catshand)
+
+Cat's Hand is a toolbox designed for audio editing and production in the team of Tripod Cat's Podcast. Cat's Hand (catshand) is named after the Japanese idiom "猫の手も借りたい", which means "so busy someone wants to borrow even the paw of a cat."
 
 ## Installation
 
 1. pull this git repository
-2. move to the directory of tclh
+2. move to the directory of catshand
 3. create conda environment
 
     ```bash
-    conda create -n tclh python=3.9
+    conda create -n catshand python=3.9
     ```
 
 4. Installation

@@ -1,10 +1,10 @@
 import os, re
 import pandas as pd
 from pathlib import Path
-import tclh
+import catshand
 import argparse
 import numpy as np
-from tclh.utility import timestamp2arrayidx, wavcut
+from catshand.utility import timestamp2arrayidx, wavcut
 from scipy.io.wavfile import read, write
 
 def main(ip_path, op_path, csv_path,

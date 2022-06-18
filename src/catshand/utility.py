@@ -1,3 +1,22 @@
+import sys
+import json
+import logging
+from datetime import datetime
+
+def loggergen(logfld):
+    logtime = datetime.now().strftime('%m%d%Y_%H%M')
+    logformat = "%(levelname)s:%(name)s:%(asctime)s:%(message)s"
+    file_handler = logging.FileHandler(filename=logfld.joinpath(f'log_{logtime}.log'))
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    handlers = [file_handler, stdout_handler]
+    logging.basicConfig(
+        format = logformat,
+        handlers = handlers,
+        encoding ='utf-8', 
+        level = logging.INFO)
+    logger = logging.getLogger()
+    return logger
+
 def timestamp2arrayidx(timestamp, fs):
     timestamp_list = timestamp.split(':')
     hr = int(timestamp_list[0])
@@ -27,3 +46,4 @@ def wavcut(arrayidx_list_ip, wav_data):
         end_idx = arrayidx_list[idx + 1]
         wav_data_list.append(wav_data[:, start_idx:end_idx])
     return wav_data_list
+

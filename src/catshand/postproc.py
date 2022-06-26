@@ -17,8 +17,7 @@ class postproc:
         with open(prjconfig_path) as f:
             prjconfig = json.load(f)
         
-        self.prjconfig = prjconfig
-        
+        self.prjconfig = prjconfig        
         
         config_fld = prjconfig_path.parent
         self.metadata_path = config_fld.joinpath('metadata.json')
@@ -83,8 +82,7 @@ class postproc:
         change_in_dBFS = target_dBFS - sound_nosilence.dBFS
         return sound.apply_gain(change_in_dBFS)
 
-    def wav2mergemono(self):
-        
+    def wav2mergemono(self, target_fs = 44100):
         with open(self.metadata_path, 'r') as f:
             self.mainmetadata_dict = json.load(f)
 
@@ -92,7 +90,7 @@ class postproc:
         for section in self.folderlist:    
             audiolength = []
             for wavfile, value in self.mainmetadata_dict['postedit'][section].items():
-                audiolength.append(value['shape'][0])
+                audiolength.append(value['shape'][0] / value['fs'])
 
             max_audiolength = np.amax(audiolength)
             maxlength_dict[section] = str(max_audiolength)
@@ -103,22 +101,19 @@ class postproc:
             self.mainmetadata_dict = json.load(f)
             f.seek(0)
             self.mainmetadata_dict['maxlength'] = maxlength_dict
+            self.mainmetadata_dict['op_fs'] = target_fs
             json.dump(self.mainmetadata_dict, f, indent=2, sort_keys=True)
-            f.truncate()
+            f.truncate()      
         
         for name in self.namelistorder:
             self.logger.info(name)
             if not self.opfilelist[name].is_file():
-                target_fs = 44100
-                
                 wavtmp = []
                 for section in self.folderlist:
                     wavfile = self.ipfilelist_dict[name][section][0]
                     self.logger.info(str(wavfile))
                     
                     fs, data = read(str(wavfile))
-                    # print(fs)
-                    # print(data.dtype)
                     if data.ndim == 2:
                         data = data[:, 0]
                         
@@ -130,19 +125,18 @@ class postproc:
                     if fs != target_fs:
                         fs_factor = target_fs / fs
                         target_length = int(len(data)*fs_factor)
-                        # data = resample(data, target_length).astype(np.int16, order='C')
                         data = data.astype('float')
-                        data = librosa.resample(data, 32000, 44100)
+                        data = librosa.resample(data, fs, target_fs)
                         data = data.astype(np.int16, order='C') 
                     else:
                         fs_factor = 1
                     
-                    max_length = int(int(self.mainmetadata_dict['maxlength'][section]) * fs_factor)
+                    max_length = int(float(self.mainmetadata_dict['maxlength'][section]) * fs)
                     new_length = data.shape[0]
                     self.logger.info(max_length)
                     self.logger.info(new_length)
                     if (max_length - new_length) > 0:
-                        data_tmp = np.pad(data, (0, int(int(self.mainmetadata_dict['maxlength'][section]) * fs_factor) - data.shape[0]), 'constant')
+                        data_tmp = np.pad(data, (0, int(max_length - new_length)), 'constant')
                     else:
                         data_tmp = data
                         
@@ -169,7 +163,6 @@ class postproc:
                 
                 wavtmp_as_short_nosilence = self.remove_silence(wavtmp_as_short)
                 wavtmp_as_result = self.match_target_amplitude(wavtmp_as, wavtmp_as_short_nosilence, -20)
-                # wavtmp_as_result = compress_dynamic_range(wavtmp_as_result)
                 wavtmp_as_result = np.array(wavtmp_as_result.get_array_of_samples())
                 
                 self.logger.info(wavtmp_as_result.shape)

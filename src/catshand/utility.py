@@ -1,5 +1,7 @@
-import sys
+import sys, re
 import json
+import click
+from pathlib import Path
 import logging
 from datetime import datetime
 
@@ -47,3 +49,39 @@ def wavcut(arrayidx_list_ip, wav_data):
         wav_data_list.append(wav_data[:, start_idx:end_idx])
     return wav_data_list
 
+
+def asknames(amount, type):
+    names = []
+    for i in range(amount):
+        name = click.prompt(f'{type} number {i+1}', type = str)
+        names.append(name)
+    return names
+
+def configgen(prjpath):
+    prjpath = Path(prjpath)
+    result = re.search(r'^.*EP([0-9]*).*$', prjpath.name)
+    print(result.group)
+    json_pars = {}
+    if result: 
+        EPnum = int(result.group(1))
+        if click.confirm(f'Is {EPnum} the episode number?', default=True):
+            json_pars['project_name'] = f'EP{str(EPnum).zfill(3)}'
+        else:
+            EPnum = click.prompt('The episode number for this project', type = int)
+            json_pars['project_name'] = f'EP{str(int(EPnum)).zfill(3)}'
+    else:
+        EPnum = click.prompt('The episode number for this project', type = int)
+        json_pars['project_name'] = f'EP{str(int(EPnum)).zfill(3)}'
+    
+    count_host = click.prompt('The amount of host(s)', type = int)
+    json_pars['hosts'] = asknames(count_host, 'Host')
+    count_guest = click.prompt('The amount of guest(s)', type = int)
+    json_pars['guests'] = asknames(count_guest, 'Guest')
+    
+    opconfigdir = prjpath.joinpath('config')
+    opconfigdir.mkdir(exist_ok = True)
+    
+    with open(opconfigdir.joinpath('config.json'), 'w') as f:
+        json.dump(json_pars, f, indent=2, sort_keys=False)
+    
+    return   

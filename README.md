@@ -9,13 +9,14 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 3. create conda environment
 
     ```bash
-    conda create -n catshand python=3.9
+    conda env create -n catshand -f environment.yml
+    ## catshand can be replaced by your-own-env-name
     ```
+
 
 4. Installation
 
     ```bash
-    pip install -r requirements.txt
     pip install -e .
     ```
 
@@ -23,8 +24,9 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 
 ## Function
 
-
 ### 1. *.wav divider
+
+#### Demo
 
 ```bash
 python .\tools\wavdivider.py -i <input_dir> -o <output_dir> -c .\tools\split_test.csv
@@ -32,7 +34,7 @@ python .\tools\wavdivider.py -i <input_dir> -o <output_dir> -c .\tools\split_tes
 
 By changing the *.csv file, users can define timestamps for spliting wav files in the input directory. The timestamp format is HH:MM:SS.
 
-## Notes
+#### Notes
 
 1. This code is designed for single channel signed 16-bit.
 
@@ -49,3 +51,27 @@ Google: https://tinyurl.com/2ynkqvl4
 Spotify: https://tinyurl.com/29ms2asr
 Kkbox: https://tinyurl.com/2aae45g3
 ```
+
+### 3. Wav Files Converter
+
+#### Demo
+
+1. Download test files [Link](https://drive.google.com/drive/folders/14T52ACyoYR1IxLtU7rNCz6J1y8pjzUCL?usp=sharing)
+
+2. Transfer a folder to a temperary directory
+
+3. Run the following command
+
+```bash
+
+python .\tools\wavfconverter.py -i C:\Users\michaelshih\Documents\Podcast_tmp\dev\test_fsconversion          
+
+``` 
+
+4. Options
+
+- `-i`: define input dir
+
+- `-e`: define output dir; default = None
+
+- `-tfs`: target sampling rate; default = 32000 

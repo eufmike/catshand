@@ -64,7 +64,7 @@ Kkbox: https://tinyurl.com/2aae45g3
 
 ```bash
 
-python .\tools\wavfconverter.py -i C:\Users\michaelshih\Documents\Podcast_tmp\dev\test_fsconversion          
+python .\tools\wavfconverter.py -i <input_dir>     
 
 ``` 
 

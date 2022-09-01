@@ -1,4 +1,5 @@
 import json
+from pathlib import Path 
 import numpy as np
 import logging
 import librosa
@@ -8,16 +9,17 @@ from pydub import AudioSegment
 from pydub.effects import normalize
 from pydub.silence import split_on_silence
 from pydub.effects import compress_dynamic_range
-
+    
 class postproc:
     def __init__(self, prjconfig_path):
         self.logger = logging.getLogger(__name__)
         self.logger.info(f'prjconfig: {prjconfig_path}')
         
         with open(prjconfig_path) as f:
-            prjconfig = json.load(f)
+            self.prjconfig = json.load(f)       
         
-        self.prjconfig = prjconfig        
+        with open(Path(__file__).parent.joinpath('hosts.json')) as f:
+            self.hostsnameidx = json.load(f)
         
         config_fld = prjconfig_path.parent
         self.metadata_path = config_fld.joinpath('metadata.json')
@@ -32,6 +34,7 @@ class postproc:
         self.folderlist = [x.name for x in sorted(ip_path.iterdir())]
         self.ipfilelist_dict = {}
         self.opfilelist = {}
+        
         for name in self.namelistorder:
             self.ipfilelist_dict[name] = {}
             for fldname in self.folderlist:
@@ -170,4 +173,34 @@ class postproc:
         
         self.logger.info(f'mainmetadata_dict: {self.mainmetadata_dict}')
         
-        return 
+        return
+
+# =========================================================
+
+def highlightproc(ippath, oppath, target_fs = 32000):
+    fs, wavtmp = read(str(ippath))
+    
+    wavtmp_as = AudioSegment(
+                        wavtmp.tobytes(), 
+                        frame_rate = target_fs,
+                        sample_width = wavtmp.dtype.itemsize, 
+                        channels = 1)
+
+    wavtmp_as_short_nosilence = remove_silence(wavtmp_as)
+    wavtmp_as_result = match_target_amplitude(wavtmp_as, wavtmp_as_short_nosilence, -20)
+    wavtmp_as_result = np.array(wavtmp_as_result.get_array_of_samples())
+    write(oppath, target_fs, wavtmp_as_result)
+    return
+
+def match_target_amplitude(sound, sound_nosilence, target_dBFS):
+    change_in_dBFS = target_dBFS - sound_nosilence.dBFS
+    return sound.apply_gain(change_in_dBFS)
+
+def remove_silence(sound):
+    chunks = split_on_silence(
+        sound, 
+        min_silence_len = 1000,
+        silence_thresh = -40
+    )
+    sound_result = sum(chunks)
+    return sound_result

@@ -2,7 +2,8 @@ LICENSE
 README.md
 setup.py
 src/catshand/__init__.py
-src/catshand/_module.py
+src/catshand/audacitytool.py
+src/catshand/pipefunc.py
 src/catshand/postproc.py
 src/catshand/utility.py
 src/catshand/webtool.py

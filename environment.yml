@@ -1,4 +1,3 @@
-name: catshand
 channels:
   - conda-forge
   - defaults

@@ -6,9 +6,10 @@ import argparse
 def main(prj_path, mat_path):
     audtl = audacitytool(prj_path, mat_path)
     audtl.importrecording()
-    audtl.importmaterial()    
+    audtl.importmaterial()
+    audtl.importhighlight()
     audtl.addmusic(default_music = "Middle_01.wav")
-    # audtl.compressor()
+    #audtl.midedit()
     return
 
 if __name__ == "__main__":

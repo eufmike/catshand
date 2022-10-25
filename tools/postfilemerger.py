@@ -1,6 +1,6 @@
 from pathlib import Path
 import argparse
-from catshand.utility import loggergen
+from catshand.utility import loggergen, configgen
 from catshand.postproc import postproc
  
 def main(ip_path, op_path, prjconfig_path):
@@ -8,6 +8,9 @@ def main(ip_path, op_path, prjconfig_path):
     ip_path = Path(ip_path)
     op_path = Path(op_path)
     prjconfig_path = Path(prjconfig_path)
+    
+    if not prjconfig_path.is_file():
+        configgen(prjconfig_path.parents[1])
     
     op_path.mkdir(exist_ok = True)
     

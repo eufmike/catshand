@@ -23,8 +23,6 @@
     python .\tools\wavfconverter.py -i C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight -o C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight_export --ext 'wav'
     ```
 
-- create or change the config/config.json 
-- postfilemerger.py
 
-
+- run Audacity macro tool 
 python .\tools\audacity_tool.py -i C:\Users\michaelshih\Documents\Podcast_tmp\EP025 -m Z:\sc2.shih\Drive\Podcast\Edit\material

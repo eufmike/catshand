@@ -50,18 +50,21 @@ class audacitytool:
             self.TRACK_OFFSET = self.audtconfig.get('track_offset')
             self.HIGHLIGHT_OFFSET = self.audtconfig.get('highlight_offset')
             self.ENDCREDIT_OFFSET = self.audtconfig.get('endcredt_offset')
+            self.ENDMUSIC_OFFSET = self.audtconfig.get('endmusic_offset')
                     
         else: 
             self.TRACK_HEIGHT = 80
             self.TRACK_OFFSET = 29.6
             self.HIGHLIGHT_OFFSET = 10
             self.ENDCREDIT_OFFSET = 9.2
-             
+            self.ENDMUSIC_OFFSET = -4
+            
             self.audtconfig = {
                 'track_height': self.TRACK_HEIGHT, 
                 'track_offset': self.TRACK_OFFSET,
                 'highlight_offset': self.HIGHLIGHT_OFFSET,
                 'endcredt_offset': self.ENDCREDIT_OFFSET, 
+                'endmusic_offset':self.ENDMUSIC_OFFSET,
                 'opmusic_path': self.OPMUSIC_PATH, 
                 'endmusic_path': self.ENDMUSIC_PATH, 
                 'endcredit_path': self.ENDCREDIT_PATH, 
@@ -134,7 +137,9 @@ class audacitytool:
             do_command(f'Compressor: Threshold={str(-12)} NoiseFloor={str(-35)} Ratio={str(2)}')
             do_command(f'SelectTracks: Mode="Set" Track="{len(tracknamelist)}" TrackCount="1"')
             do_command(f'SetTrack: Name="endmusic" Height={int(self.TRACK_HEIGHT*0.6)}')
-            do_command(f'SetClip: At="0" Start="{self.TRACK_OFFSET + self.TRACK_LENGTH_MAX}"')
+            do_command(f'SelectTime: Start="{0}" End="{2}"')
+            do_command(f'AdjustableFade: preset="SCurveIn"')
+            do_command(f'SetClip: At="0" Start="{self.TRACK_OFFSET + self.TRACK_LENGTH_MAX + self.ENDMUSIC_OFFSET}"')
 
         trackinfo = getinfo2json()
         tracknamelist = [trackinfo['name'] for trackinfo in getinfo2json()]
@@ -144,7 +149,7 @@ class audacitytool:
             do_command(f'Compressor: Threshold={str(-12)} NoiseFloor={str(-35)} Ratio={str(2)}')
             do_command(f'SelectTracks: Mode="Set" Track="{len(tracknamelist)}" TrackCount="1"')
             do_command(f'SetTrack: Name="endcredit" Height={int(self.TRACK_HEIGHT*0.6)}')
-            do_command(f'SetClip: At="0" Start="{self.TRACK_OFFSET + self.TRACK_LENGTH_MAX + self.ENDCREDIT_OFFSET}"')
+            do_command(f'SetClip: At="0" Start="{self.TRACK_OFFSET + self.TRACK_LENGTH_MAX + self.ENDCREDIT_OFFSET + self.ENDMUSIC_OFFSET}"')
         
         return
     

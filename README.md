@@ -8,15 +8,14 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 2. move to the directory of catshand
 3. create conda environment
 
-    ```bash
+    ```shell
     conda env create -n catshand -f environment.yml
     ## catshand can be replaced by your-own-env-name
     ```
 
-
 4. Installation
 
-    ```bash
+    ```shell
     pip install -e .
     ```
 
@@ -28,7 +27,7 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 
 #### Demo
 
-```bash
+```shell
 python .\tools\wavdivider.py -i <input_dir> -o <output_dir> -c .\tools\split_test.csv
 ```
 
@@ -38,7 +37,7 @@ By changing the *.csv file, users can define timestamps for spliting wav files i
 
 1. This code is designed for single channel signed 16-bit.
 
-2. Exported rates can be different between files, while output rate will be the same as input rate. 
+2. Exported rates can be different between files, while output rate will be the same as input rate.
 
 ### 2. Podcast Url Parser
 
@@ -62,11 +61,9 @@ Kkbox: https://tinyurl.com/2aae45g3
 
 3. Run the following command
 
-```bash
-
-python .\tools\wavfconverter.py -i <input_dir>     
-
-``` 
+    ```shell
+    python .\tools\wavfconverter.py -i <input_dir>
+    ```
 
 4. Options
 
@@ -74,4 +71,36 @@ python .\tools\wavfconverter.py -i <input_dir>
 
 - `-e`: define output dir; default = None
 
-- `-tfs`: target sampling rate; default = 32000 
+- `-tfs`: target sampling rate; default = 32000
+
+## Processing Steps
+
+- Download finalized edited audio from Google Drive
+- Rename all session to 01, 02, 03...
+- Rename all fileanmes by hosts' and guests' name. Ensure the naming fashion is the same as config.json
+
+- run prjpost on postedit wavs
+
+    ```shell
+    prjpost -i C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_raw
+    ```
+
+- run wav files merger audmerger.py
+
+    ```shell
+    audmerger -i 'C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_raw_export\' -o 'C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_merged\' -cfg C:\Users\michaelshih\Documents\Podcast_tmp\EP024\config\config.json
+    ```
+
+- Download hightlight from Google Drive, current only support wav
+- Rename the filename to `highlight.wav`
+- run postedit on the hightlight
+
+    ```shell
+    postedit -i C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight -o C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight_export --ext 'wav'
+    ```
+
+- run Audacity macro tool audacitypipe
+
+    ```shell
+    audacitypipe -i C:\Users\michaelshih\Documents\Podcast_tmp\EP025 -m Z:\sc2.shih\Drive\Podcast\Edit\material
+    ```

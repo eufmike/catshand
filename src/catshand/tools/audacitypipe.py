@@ -3,7 +3,7 @@ from pathlib import Path
 from catshand.audacitytool import audacitytool
 import argparse
 
-def main(prj_path, mat_path):
+def audacitypipe(prj_path, mat_path):
     audtl = audacitytool(prj_path, mat_path)
     audtl.importrecording()
     audtl.importmaterial()
@@ -12,14 +12,21 @@ def main(prj_path, mat_path):
     #audtl.midedit()
     return
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='run audacity named-pipe tool')
+def main():
+    description = 'Auddacity_tool controls Audacity via macro PIPE.'
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-i', '--prj_path', help = 'input folder for editing projects')
     parser.add_argument('-m', '--mat_path', help = 'the folder of editing materials')
     args = parser.parse_args()
     
     arg = {
         'prj_path': args.prj_path,
+        'prj_path': args.prj_path,
+        
         'mat_path': args.mat_path, 
     }
-    main(**arg)
+    audacitypipe(**arg)
+    return
+
+if __name__ == "__main__":
+    main()

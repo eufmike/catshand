@@ -10,5 +10,6 @@ src/catshand/webtool.py
 src/catshand.egg-info/PKG-INFO
 src/catshand.egg-info/SOURCES.txt
 src/catshand.egg-info/dependency_links.txt
+src/catshand.egg-info/entry_points.txt
 src/catshand.egg-info/requires.txt
 src/catshand.egg-info/top_level.txt

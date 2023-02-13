@@ -9,7 +9,7 @@ from scipy.io.wavfile import read, write
 from pydub import AudioSegment
 import soundfile
 
-def main(ip_path, op_path, ext, target_fs):
+def prjpost(ip_path, op_path, ext, target_fs):
     ip_path = Path(ip_path)
     if op_path is None: 
         op_path = ip_path.parent.joinpath(f'{ip_path.name}_export')
@@ -51,8 +51,9 @@ def main(ip_path, op_path, ext, target_fs):
         write(opfile, target_fs, data)
     return
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='convert wav format')
+def main():
+    description = 'Post-processing tool for edited audio files.'
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-i', '--input_path', help = 'input folder for audio files')
     parser.add_argument('-o', '--output_path', help = 'output folder of wavs')
     parser.add_argument('-e', '--ext', default='wav', help = 'extension of audio files')
@@ -65,4 +66,10 @@ if __name__ == "__main__":
         'ext': args.ext,
         'target_fs': args.target_fs,
     }
-    main(**arg)
+    
+    prjpost(**arg)
+    return
+    
+    
+if __name__ == "__main__":
+    main()

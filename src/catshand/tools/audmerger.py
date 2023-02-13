@@ -3,7 +3,7 @@ import argparse
 from catshand.utility import loggergen, configgen
 from catshand.postproc import postproc
  
-def main(ip_path, op_path, prjconfig_path):
+def audmerger(ip_path, op_path, prjconfig_path):
     
     ip_path = Path(ip_path)
     op_path = Path(op_path)
@@ -27,8 +27,9 @@ def main(ip_path, op_path, prjconfig_path):
 
     return
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='divide wav files with given time stamp')
+def main():
+    description = "audmerger merges audio files"
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-i', '--input_dir', help = 'input folders with *.wav files.')
     parser.add_argument('-o', '--output_dir', help = 'output folders for divided *.wav files.')
     parser.add_argument('-cfg', '--prjconfig_path', help = 'the project config')
@@ -39,5 +40,9 @@ if __name__ == "__main__":
         'op_path': args.output_dir,
         'prjconfig_path': args.prjconfig_path,
     }
+    audmerger(**arg)
     
-    main(**arg)
+    return
+
+if __name__ == "__main__":
+    main()

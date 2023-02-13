@@ -8,7 +8,7 @@ from scipy.io.wavfile import read, write
 from catshand.postproc import highlightproc
 from pydub import AudioSegment
 
-def main(ip_path, op_path, ext, target_fs):
+def highlight(ip_path, op_path, ext, target_fs):
     ip_path = Path(ip_path)
     if op_path is None: 
         op_path = ip_path.parent.joinpath(f'{ip_path.name}_export')
@@ -24,8 +24,9 @@ def main(ip_path, op_path, ext, target_fs):
                 
     return
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='convert wav format')
+def main():
+    description = 'Convert highlight wav format'
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-i', '--input_path', help = 'input folder for audio files')
     parser.add_argument('-o', '--output_path', help = 'output folder of wavs')
     parser.add_argument('-e', '--ext', default='wav', help = 'extension of audio files')
@@ -38,4 +39,9 @@ if __name__ == "__main__":
         'ext': args.ext,
         'target_fs': args.target_fs,
     }
-    main(**arg)
+    
+    highlight(**arg)
+    return
+
+if __name__ == "__main__":
+    main()

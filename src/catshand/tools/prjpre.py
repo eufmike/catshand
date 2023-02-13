@@ -7,7 +7,7 @@ import numpy as np
 from catshand.utility import timestamp2arrayidx, wavcut
 from scipy.io.wavfile import read, write
 
-def main(ip_path, op_path, csv_path,
+def prjpre(ip_path, op_path, csv_path,
          filetype = '.wav'):
     print(f'ip_path: {ip_path}') 
     print(f'op_path: {op_path}')
@@ -43,8 +43,9 @@ def main(ip_path, op_path, csv_path,
     print('Done')         
     return
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='divide wav files with given time stamp')
+def main():
+    description = "prjpreprocess creates the project profile and prepare preprocessing materials."
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-i', '--input_dir', help = 'input folders with *.wav files.')
     parser.add_argument('-o', '--output_dir', help = 'output folders for divided *.wav files.')
     parser.add_argument('-c', '--csv', help = 'csv files with time stamps')
@@ -56,4 +57,8 @@ if __name__ == "__main__":
         'csv_path': args.csv,
     }
     
-    main(**arg)
+    prjpre(**arg)
+    return
+
+if __name__ == "__main__":
+    main()

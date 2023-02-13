@@ -134,10 +134,10 @@ class postproc:
                     else:
                         fs_factor = 1
                     
-                    max_length = int(float(self.mainmetadata_dict['maxlength'][section]) * fs)
+                    max_length = int(float(self.mainmetadata_dict['maxlength'][section]) * target_fs)
                     new_length = data.shape[0]
-                    self.logger.info(max_length)
-                    self.logger.info(new_length)
+                    self.logger.info(f'max_length:{max_length}')
+                    self.logger.info(f'new_length:{new_length}')
                     if (max_length - new_length) > 0:
                         data_tmp = np.pad(data, (0, int(max_length - new_length)), 'constant')
                     else:

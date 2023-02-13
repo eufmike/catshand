@@ -27,7 +27,7 @@ class audacitytool:
         
         self.OPMUSIC_PATH = str(self.matpath.joinpath('direct_import', 'direct_import_op.wav'))
         self.ENDMUSIC_PATH = str(self.matpath.joinpath('direct_import', 'direct_import_end.wav'))
-        self.ENDCREDIT_PATH = str(self.matpath.joinpath('direct_import', 'direct_import_endcredit.wav'))
+        self.ENDCREDIT_PATH = str(self.matpath.joinpath('direct_import', 'direct_import_endcredit_TCGA_edited.wav'))
         
         # load config
         if self.configpath.is_file():
@@ -72,8 +72,6 @@ class audacitytool:
             
             with open(self.audtconfigpath, 'w') as f:
                 json.dump(self.audtconfig, f, indent=2, sort_keys=False)
-        
-        
         
         return
         
@@ -144,6 +142,7 @@ class audacitytool:
         trackinfo = getinfo2json()
         tracknamelist = [trackinfo['name'] for trackinfo in getinfo2json()]
 
+        print(self.ENDCREDIT_PATH)
         if 'endcredit' not in tracknamelist:
             do_command(f'Import2: Filename="{self.ENDCREDIT_PATH}"')
             do_command(f'Compressor: Threshold={str(-12)} NoiseFloor={str(-35)} Ratio={str(2)}')

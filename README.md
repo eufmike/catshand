@@ -9,17 +9,30 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 3. create conda environment
 
     ```shell
-    conda env create -n catshand -f environment.yml
+    conda env create -n catshand python=3.9
     ## catshand can be replaced by your-own-env-name
     ```
 
-4. Installation
+4. Change conda env 
+
+    ```shell
+    conda activate catshand
+    ```
+
+5. Install dependency
+    
+    ```shell
+    pip install -r ./requirement.txt
+    ```
+
+
+6. Installation
 
     ```shell
     pip install -e .
     ```
 
-5. Download test files from this [link](https://drive.google.com/drive/folders/1ZK2PGQHYUtQUZYW7GLx3O8Ukr5MvmnHe?usp=sharing)
+7. Download test files from this [link](https://drive.google.com/drive/folders/1ZK2PGQHYUtQUZYW7GLx3O8Ukr5MvmnHe?usp=sharing)
 
 ## Function
 
@@ -28,7 +41,7 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 #### Demo
 
 ```shell
-python .\tools\wavdivider.py -i <input_dir> -o <output_dir> -c .\tools\split_test.csv
+prjpre -i <input_dir> -o <output_dir> -c ./src/catshand/tools/split_test.csv
 ```
 
 By changing the *.csv file, users can define timestamps for spliting wav files in the input directory. The timestamp format is HH:MM:SS.

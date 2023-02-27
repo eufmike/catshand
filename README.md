@@ -53,9 +53,10 @@ By changing the *.csv file, users can define timestamps for spliting wav files i
 2. Exported rates can be different between files, while output rate will be the same as input rate.
 
 ### 2. Podcast Url Parser
+# currently down
 
 ```bash
-python .\tools\linkparser.py
+linkparser
 # return
 Export:
 Apple: https://tinyurl.com/2y3yp4xs

@@ -96,7 +96,7 @@ Kkbox: https://tinyurl.com/2aae45g3
 - run postedit on the hightlight
 
     ```shell
-    postedit -i C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight -o C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight_export --ext 'wav'
+    prjpost -i C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight -o C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight_export --ext 'wav'
     ```
 
 - run Audacity macro tool audacitypipe

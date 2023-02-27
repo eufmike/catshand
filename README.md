@@ -64,7 +64,7 @@ Spotify: https://tinyurl.com/29ms2asr
 Kkbox: https://tinyurl.com/2aae45g3
 ```
 
-### 3. Wav Files Converter
+### 3. Convert to Wav Format
 
 #### Demo
 
@@ -75,7 +75,7 @@ Kkbox: https://tinyurl.com/2aae45g3
 3. Run the following command
 
     ```shell
-    python .\tools\wavfconverter.py -i <input_dir>
+    prjpost -i <input_dir>
     ```
 
 4. Options

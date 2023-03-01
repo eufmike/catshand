@@ -21,10 +21,15 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 
 5. Install dependency
     
+    for Mac User
     ```shell
     pip install -r ./requirement.txt
     ```
-
+    for Windows User
+    ```shell
+    pip install -r ./requirement_win.txt
+    ```
+    
 
 6. Installation
 

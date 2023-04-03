@@ -7,11 +7,13 @@ import numpy as np
 from catshand.utility import timestamp2arrayidx, wavcut
 from scipy.io.wavfile import read, write
 
-def prjpre(ip_path, op_path, csv_path,
-         filetype = '.wav'):
-    print(f'ip_path: {ip_path}') 
-    print(f'op_path: {op_path}')
-    print(f'csv_path: {csv_path}')
+def prjpre(args):
+    print(args)
+
+    ip_path = args.input_dir
+    op_path = args.output_dir
+    csv_path = args.csv
+    filetype = '.wav'
     
     ip_path = Path(ip_path)
     op_path = Path(op_path)
@@ -43,22 +45,15 @@ def prjpre(ip_path, op_path, csv_path,
     print('Done')         
     return
 
-def main():
+def add_subparser(subparsers):
     description = "prjpreprocess creates the project profile and prepare preprocessing materials."
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('-i', '--input_dir', help = 'input folders with *.wav files.')
-    parser.add_argument('-o', '--output_dir', help = 'output folders for divided *.wav files.')
-    parser.add_argument('-c', '--csv', help = 'csv files with time stamps')
-    args = parser.parse_args()
-    
-    arg = {
-        'ip_path': args.input_dir,
-        'op_path': args.output_dir,
-        'csv_path': args.csv,
-    }
-    
-    prjpre(**arg)
+    # parser = argparse.ArgumentParser(description=description)
+    subparsers = subparsers.add_parser('prjpre', help=description)
+    subparsers.add_argument('-i', '--input_dir', help = 'input folders with *.wav files.')
+    subparsers.add_argument('-o', '--output_dir', help = 'output folders for divided *.wav files.')
+    subparsers.add_argument('-c', '--csv', help = 'csv files with time stamps')
+    subparsers.set_defaults(func=prjpre)
     return
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     add_subparser()

@@ -30,7 +30,7 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 3. create conda environment
 
     ```shell
-    conda env create -n catshand python=3.9
+    conda create -n catshand python=3.9
     ## catshand can be replaced by your-own-env-name
     ```
 
@@ -42,10 +42,15 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 
 5. Install dependency
     
+    for Mac User
     ```shell
-    pip install -r ./requirement.txt
+    pip install -r ./requirement_core.txt
     ```
-
+    for Windows User
+    ```shell
+    pip install -r ./requirement_win.txt
+    ```
+    
 
 6. Installation
 

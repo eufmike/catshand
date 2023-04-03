@@ -3,6 +3,7 @@ README.md
 setup.py
 src/catshand/__init__.py
 src/catshand/audacitytool.py
+src/catshand/main.py
 src/catshand/pipefunc.py
 src/catshand/postproc.py
 src/catshand/utility.py
@@ -13,3 +14,10 @@ src/catshand.egg-info/dependency_links.txt
 src/catshand.egg-info/entry_points.txt
 src/catshand.egg-info/requires.txt
 src/catshand.egg-info/top_level.txt
+src/catshand/tools/__init__.py
+src/catshand/tools/audacitypipe.py
+src/catshand/tools/audmerger.py
+src/catshand/tools/highlight.py
+src/catshand/tools/linkparser.py
+src/catshand/tools/prjpost.py
+src/catshand/tools/prjpre.py

@@ -7,7 +7,7 @@ from fake_useragent import UserAgent
 import urllib
 from catshand.webtool import UrlShortenTinyurl, podcastlistgen, urlparser
 
-def linkparser():
+def linkparser(args):
     ep_idx = 1
     podcastlist = podcastlistgen(ep_idx)
     platforms = ['Apple', 'Google', 'Spotify', 'KKbox']
@@ -19,12 +19,13 @@ def linkparser():
         shorurl_tmp = podcastlist[platform]['short url']
         print(f'{platform.capitalize()}: {shorurl_tmp}')
 
-def main():
+def add_subparser(subparsers):
     description = 'linkparser collects the most recent podcast links.'
-    parser = argparse.ArgumentParser(description=description)
-    args = parser.parse_args()
-    linkparser()
+    subparsers = subparsers.add_parser('linkparser', help=description)
+    subparsers.set_defaults(func=linkparser)
+    # parser = argparse.ArgumentParser(description=description)
+    # args = parser.parse_args()
     return
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

@@ -28,12 +28,7 @@ setuptools.setup(
     package_dir={"": "src"},
     entry_points={
         'console_scripts':[
-            'prjpre = catshand.tools.prjpre:main', 
-            'prjpost = catshand.tools.prjpost:main',
-            'audmerger = catshand.tools.audmerger:main',
-            'audacitypipe = catshand.tools.audacitypipe:main',
-            'linkparser = catshand.tools.linkparser:main',
-            'highlight = catshand.tools.highlight:main',
+            'catshand = catshand.main:main',
         ]
     },
     packages=setuptools.find_packages(where="src"),

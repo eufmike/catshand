@@ -9,7 +9,7 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 3. create conda environment
 
     ```shell
-    conda env create -n catshand python=3.9
+    conda create -n catshand python=3.9
     ## catshand can be replaced by your-own-env-name
     ```
 
@@ -29,9 +29,14 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
     ```shell
     pip install -r ./requirement_win.txt
     ```
-    
 
-6. Installation
+6. Install ffmpeg
+    
+    ```shell
+    conda install -c conda-forge ffmpeg
+    ```
+
+7. Installation
 
     ```shell
     pip install -e .
@@ -46,7 +51,7 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 #### Demo
 
 ```shell
-prjpre -i <input_dir> -o <output_dir> -c ./src/catshand/tools/split_test.csv
+catshand prjpre -i <input_dir> -o <output_dir> -c ./src/catshand/tools/split_test.csv
 ```
 
 By changing the *.csv file, users can define timestamps for spliting wav files in the input directory. The timestamp format is HH:MM:SS.
@@ -61,7 +66,7 @@ By changing the *.csv file, users can define timestamps for spliting wav files i
 # currently down
 
 ```bash
-linkparser
+catshand linkparser
 # return
 Export:
 Apple: https://tinyurl.com/2y3yp4xs
@@ -81,7 +86,7 @@ Kkbox: https://tinyurl.com/2aae45g3
 3. Run the following command
 
     ```shell
-    prjpost -i <input_dir>
+    catshand prjpost -i <input_dir>
     ```
 
 4. Options
@@ -101,13 +106,13 @@ Kkbox: https://tinyurl.com/2aae45g3
 - run prjpost on postedit wavs
 
     ```shell
-    prjpost -i C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_raw
+    catshand prjpost -i C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_raw
     ```
 
 - run wav files merger audmerger.py
 
     ```shell
-    audmerger -i 'C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_raw_export\' -o 'C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_merged\' -cfg C:\Users\michaelshih\Documents\Podcast_tmp\EP024\config\config.json
+    catshand audmerger -i 'C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_raw_export\' -o 'C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_merged\' -cfg C:\Users\michaelshih\Documents\Podcast_tmp\EP024\config\config.json
     ```
 
 - Download hightlight from Google Drive, current only support wav
@@ -115,11 +120,11 @@ Kkbox: https://tinyurl.com/2aae45g3
 - run postedit on the hightlight
 
     ```shell
-    prjpost -i C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight -o C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight_export --ext 'wav'
+    catshand prjpost -i C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight -o C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight_export --ext 'wav'
     ```
 
 - run Audacity macro tool audacitypipe
 
     ```shell
-    audacitypipe -i C:\Users\michaelshih\Documents\Podcast_tmp\EP025 -m Z:\sc2.shih\Drive\Podcast\Edit\material
-    ```
+    catshand audacitypipe -i C:\Users\michaelshih\Documents\Podcast_tmp\EP025 -m Z:\sc2.shih\Drive\Podcast\Edit\material
+    ``` 

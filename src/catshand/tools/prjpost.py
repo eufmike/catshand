@@ -9,7 +9,15 @@ from scipy.io.wavfile import read, write
 from pydub import AudioSegment
 import soundfile
 
-def prjpost(ip_path, op_path, ext, target_fs):
+def prjpost(args):
+    
+    print(args)
+
+    ip_path = args.input_path
+    op_path = args.output_path
+    ext = args.ext
+    target_fs = args.target_fs
+
     ip_path = Path(ip_path)
     if op_path is None: 
         op_path = ip_path.parent.joinpath(f'{ip_path.name}_export')
@@ -51,25 +59,16 @@ def prjpost(ip_path, op_path, ext, target_fs):
         write(opfile, target_fs, data)
     return
 
-def main():
+def add_subparser(subparsers):
     description = 'Post-processing tool for edited audio files.'
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('-i', '--input_path', help = 'input folder for audio files')
-    parser.add_argument('-o', '--output_path', help = 'output folder of wavs')
-    parser.add_argument('-e', '--ext', default='wav', help = 'extension of audio files')
-    parser.add_argument('-tfs', '--target_fs', default = 32000, help = 'target output fs')
-    args = parser.parse_args()
-    
-    arg = {
-        'ip_path': args.input_path,
-        'op_path': args.output_path,
-        'ext': args.ext,
-        'target_fs': args.target_fs,
-    }
-    
-    prjpost(**arg)
+    # parser = argparse.ArgumentParser(description=description)
+    subparsers = subparsers.add_parser('prjpost', help=description)
+    subparsers.add_argument('-i', '--input_path', help = 'input folder for audio files')
+    subparsers.add_argument('-o', '--output_path', help = 'output folder of wavs')
+    subparsers.add_argument('-e', '--ext', default='wav', help = 'extension of audio files')
+    subparsers.add_argument('-tfs', '--target_fs', default = 32000, help = 'target output fs')
+    subparsers.set_defaults(func=prjpost)
     return
     
-    
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

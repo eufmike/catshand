@@ -3,8 +3,11 @@ import argparse
 from catshand.utility import loggergen, configgen
 from catshand.postproc import postproc
  
-def audmerger(ip_path, op_path, prjconfig_path):
-    
+def audmerger(args):
+    ip_path = args.input_dir
+    op_path = args.output_dir
+    prjconfig_path = args.prjconfig_path
+
     ip_path = Path(ip_path)
     op_path = Path(op_path)
     prjconfig_path = Path(prjconfig_path)
@@ -27,22 +30,15 @@ def audmerger(ip_path, op_path, prjconfig_path):
 
     return
 
-def main():
+def add_subparser(subparsers):
     description = "audmerger merges audio files"
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('-i', '--input_dir', help = 'input folders with *.wav files.')
-    parser.add_argument('-o', '--output_dir', help = 'output folders for divided *.wav files.')
-    parser.add_argument('-cfg', '--prjconfig_path', help = 'the project config')
-    args = parser.parse_args()
-    
-    arg = { 
-        'ip_path': args.input_dir,
-        'op_path': args.output_dir,
-        'prjconfig_path': args.prjconfig_path,
-    }
-    audmerger(**arg)
-    
+    # parser = argparse.ArgumentParser(description=description)
+    subparsers = subparsers.add_parser('audmerger', help=description)
+    subparsers.add_argument('-i', '--input_dir', help = 'input folders with *.wav files.')
+    subparsers.add_argument('-o', '--output_dir', help = 'output folders for divided *.wav files.')
+    subparsers.add_argument('-cfg', '--prjconfig_path', help = 'the project config')
+    subparsers.set_defaults(func=audmerger)
     return
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

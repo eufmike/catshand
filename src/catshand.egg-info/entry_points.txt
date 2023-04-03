@@ -1,7 +1,2 @@
 [console_scripts]
-audacitypipe = catshand.tools.audacitypipe:main
-audmerger = catshand.tools.audmerger:main
-highlight = catshand.tools.highlight:main
-linkparser = catshand.tools.linkparser:main
-prjpost = catshand.tools.prjpost:main
-prjpre = catshand.tools.prjpre:main
+catshand = catshand.main:main

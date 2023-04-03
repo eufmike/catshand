@@ -44,19 +44,21 @@ def prjgen(args):
 
     if mat_dir is None: return
     
-    if prj_dir.joinpath('config', 'audt_config.json').is_file():
+    json_path = prj_dir.joinpath('config', 'audt_config.json')
+
+    if json_path.is_file():
         if click.confirm(f'audt_config.json already exists, Overwrite?', default=True):
+            logger.info(f'Overwrite: {json_path}')
             templatejson_path = Path(__file__).parents[1].joinpath("config", "audt_config.json")
             with open(templatejson_path) as f:
                 audt_config = json.load(f)
 
             audt_config['material']['root'] = str(mat_dir)
-            print(audt_config)
 
-            json_path = prj_dir.joinpath('config', 'audt_config.json')
             with open(json_path, "w") as f:
                 json.dump(audt_config, f, indent=2, sort_keys=False)
 
+            logger.info(f'audt_config.json: {audt_config}')
     return
 
 def add_subparser(subparsers):

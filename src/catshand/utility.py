@@ -1,12 +1,31 @@
-import sys, re
+import os, sys, re
 import json
 import click
 from pathlib import Path
 import logging
 import shutil
 from datetime import datetime
+from sys import platform
+import pandas as pd
+from tqdm import tqdm
 
-def loggergen(logfld):
+
+USERNAME = os.environ.get('USERNAME')
+
+def loggergen(logfld = None):
+    if logfld is None:
+        if platform == "linux" or platform == "linux2":
+            # linux
+            logfld = Path('var', 'log').joinpath('catshand')
+        elif platform == "darwin":
+            # OS X
+            logfld = Path('var', 'log').joinpath('catshand')
+        elif platform == "win32":
+            # Windows...
+            logfld = Path('C:\\', 'Users', USERNAME, 'AppData', 'Local', 'catshand', 'logs')
+
+    logfld.mkdir(exist_ok = True, parents=True)
+
     logtime = datetime.now().strftime('%m%d%Y_%H%M')
     logformat = "%(levelname)s:%(name)s:%(asctime)s:%(message)s"
     file_handler = logging.FileHandler(filename=logfld.joinpath(f'log_{logtime}.log'))
@@ -53,7 +72,10 @@ def wavcut(arrayidx_list_ip, wav_data):
 def asknames(amount, type):
     names = []
     for i in range(amount):
-        name = click.prompt(f'{type} number {i+1}', type = str)
+        if type == 'host':
+            name = click.prompt(f'{type} number {i+1} (HWC, Robin, Angel, Mike, WWL, THC)', type = str)
+        else:
+            name = click.prompt(f'{type} number {i+1}', type = str)
         names.append(name)
     return names
 
@@ -84,4 +106,5 @@ def configgen(prjpath):
     with open(opconfigdir.joinpath('config.json'), 'w') as f:
         json.dump(json_pars, f, indent=2, sort_keys=False)
     return   
+
 

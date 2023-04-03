@@ -1,0 +1,12 @@
+{
+    "track_height": 80,
+    "track_offset": 29.6,
+    "highlight_offset": 10,
+    "endcredt_offset": 9.2,
+    "endmusic_offset": -4,
+    "material": {
+        "opmusic_path":"direct_import/direct_import_op.wav",
+        "endmusic_path": "direct_import/direct_import_end.wav",
+        "endcredit_path": "direct_import/direct_import_endcredit_TCGA_edited.wav"
+    }
+}

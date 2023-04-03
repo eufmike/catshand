@@ -60,7 +60,7 @@ def asknames(amount, type):
 def configgen(prjpath):
     prjpath = Path(prjpath)
     result = re.search(r'^.*EP([0-9]*).*$', prjpath.name)
-    print(result.group)
+    # print(result.group)
     json_pars = {}
     if result: 
         EPnum = int(result.group(1))

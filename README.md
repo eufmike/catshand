@@ -42,7 +42,7 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
     pip install -e .
     ```
 
-7. Download test files from this [link](https://drive.google.com/drive/folders/1ZK2PGQHYUtQUZYW7GLx3O8Ukr5MvmnHe?usp=sharing)
+8. Download test files from this [link](https://drive.google.com/drive/folders/1ZK2PGQHYUtQUZYW7GLx3O8Ukr5MvmnHe?usp=sharing)
 
 ## Function
 

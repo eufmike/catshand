@@ -3,6 +3,7 @@ import json
 import click
 from pathlib import Path
 import logging
+import shutil
 from datetime import datetime
 
 def loggergen(logfld):
@@ -49,7 +50,6 @@ def wavcut(arrayidx_list_ip, wav_data):
         wav_data_list.append(wav_data[:, start_idx:end_idx])
     return wav_data_list
 
-
 def asknames(amount, type):
     names = []
     for i in range(amount):
@@ -83,5 +83,5 @@ def configgen(prjpath):
     
     with open(opconfigdir.joinpath('config.json'), 'w') as f:
         json.dump(json_pars, f, indent=2, sort_keys=False)
-    
     return   
+

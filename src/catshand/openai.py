@@ -19,7 +19,6 @@ def merge_tran_csv(csvdir, docdir, tag = ''):
     df = pd.concat(df, axis=0, ignore_index=False)
     df.reset_index(drop = False, inplace = True)
 
-
     # Define a function to format the timedelta as "HH:MM:SS"
     def format_timedelta(t):
         return '{:02d}:{:02d}:{:02d}'.format(t.components.hours, t.components.minutes, t.components.seconds)

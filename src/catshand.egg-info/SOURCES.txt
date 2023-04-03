@@ -17,7 +17,9 @@ src/catshand.egg-info/top_level.txt
 src/catshand/tools/__init__.py
 src/catshand/tools/audacitypipe.py
 src/catshand/tools/audmerger.py
+src/catshand/tools/convert_to_wav.py
 src/catshand/tools/highlight.py
 src/catshand/tools/linkparser.py
+src/catshand/tools/prjgen.py
 src/catshand/tools/prjpost.py
 src/catshand/tools/prjpre.py

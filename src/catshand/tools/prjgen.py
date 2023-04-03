@@ -64,7 +64,6 @@ def prjgen(args):
 def add_subparser(subparsers):
     description = "prjgen creates the project folder"
     subparsers = subparsers.add_parser('prjgen', help=description)
-    
     required_group = subparsers.add_argument_group('Required Arguments')
     required_group.add_argument('-d', '--root_dir', type = str, required = True, help = 'directory for the project folder')
     required_group.add_argument('-n', '--project_name', type = str, required = True, help = 'project name (example: EP028)')

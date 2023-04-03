@@ -81,7 +81,7 @@ Kkbox: https://tinyurl.com/2aae45g3
 
 1. Download test files [Link](https://drive.google.com/drive/folders/14T52ACyoYR1IxLtU7rNCz6J1y8pjzUCL?usp=sharing)
 
-2. Transfer a folder to a temperary directory
+2. Transfer a folder to a temporary directory
 
 3. Run the following command
 

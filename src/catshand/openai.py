@@ -8,12 +8,17 @@ from pydub.silence import split_on_silence, detect_nonsilent
 import openai
 import opencc
 import tiktoken
+import pickle
+import multiprocessing as mp
+mp.set_start_method('fork', force=True)
 
 # Replace with your OpenAI API key
-openai.api_key = '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'
+openai.api_key = os.environ["OPENAI_API_KEY"]
+
+# Speech to text ==========================
 
 def import_audio_file(file_path):
-
+    
     file_extension = str(file_path).split('.')[-1].lower()
     if file_extension == 'mp3':
         audio = AudioSegment.from_mp3(file_path)
@@ -23,45 +28,117 @@ def import_audio_file(file_path):
         raise Exception('Unsupported audio format')
     return audio
 
-def separate_sentences(audio, min_silence_len=500, silence_thresh=-40):
-    sections_times = detect_nonsilent(audio, min_silence_len=min_silence_len, silence_thresh=silence_thresh)
-    sections = []
-    for sections_time in tqdm(sections_times):
-        section = audio[sections_time[0]:sections_time[1]]
-        sections.append(section)
+def section_audio(idx, audio, sections_time, opsegdir, tmpdir, sections_length_digit):
+    section = audio[sections_time[0]:sections_time[1]]
+    section.export(opsegdir.joinpath(f's_{idx:0{sections_length_digit}}.wav'), format='wav')
+    return (idx, section)
 
-    print(len(sections))
-    return sections, sections_times
+def separate_sentences(audio, opsegdir, tmpdir, min_silence_len=500, silence_thresh=-40, threads = 1):
     
-def speech_to_text(audio_sections, opsegdir):
+    tmp_pkl = tmpdir.joinpath(opsegdir.name).with_suffix('.pkl')
+    if not tmp_pkl.is_file():
+        sections_times = detect_nonsilent(audio, min_silence_len=min_silence_len, silence_thresh=silence_thresh)
+        with open(tmp_pkl, 'wb') as f:
+            pickle.dump(sections_times, f)
+        print('save pkl')
+    else:
+        with open(tmp_pkl, 'rb') as f:
+            sections_times = pickle.load(f)
+        print('load pkl')
+        
+    print(len(sections_times))
+    sections_length_digit = len(str(len(sections_times)))
+    threads = 1 # Don't use multiprocessing. It is slower. 
+    
+    if threads > 1:
+        pbar = tqdm(total=len(sections_times))
+        results = []
+        def pbar_update(result):
+            results.append(result)
+            pbar.update(1)
+        
+        pool = mp.Pool(threads)
+        # sections = []
+        for idx, sections_time in enumerate(sections_times):
+            pool.apply_async(section_audio, args=(idx, audio, sections_time, opsegdir, tmpdir, sections_length_digit), callback=pbar_update)
+            # sections.append(section)
+        pool.close()
+        pool.join()
+        
+        sections = {}
+        for value in results:
+            idx, section = value
+            sections[idx] = section
+
+    else:
+        sections = {}
+        for idx, sections_time in tqdm(enumerate(sections_times)):
+            _, section = section_audio(idx, audio, sections_time, opsegdir, tmpdir, sections_length_digit)
+            sections[idx] = section
+    
+    return sections, sections_times
+
+def _speech_to_text(idx, audio_section, opsegdir):
+    # Save the section as a temporary WAV file
+    temp_file = Path(opsegdir, f'temp_section_{idx}.wav')
+    audio_section.export(temp_file, format='wav')
+    audio_section = audio_section.set_frame_rate(16000)
+    # Load the WAV file and convert to base64
+    with open(temp_file, 'rb') as f:
+        # Perform speech-to-text using the OpenAI API
+        try:
+            #initial_prompt = "Transcribe this audio to tranditional Chinese and English. pause fillers/filled pauses and particles should be in Chinese."
+            # initial_prompt = "本音檔是一個討論生物醫學研究、在美生活、求學生涯以及心理健康的對話。將本音檔產生繁體中# 文的逐字稿，音檔中的贅詞、填詞和語助詞應該用繁體中文表示。只有關鍵詞、人名以及專有名詞用英文表示。逐字稿不應# 該包含英文、繁體中文以外的字。少於兩秒的音檔只產生繁體中文。Hmm替代為嗯。"
+            initial_prompt = "This audio discusses biomedical research, experience in living abroad, and mental health. Please cerate a transcript of this audio mainly in traditional Chinese, only transcribe names, professional terms in both Traditional Chinese and English. Particals and filled pauses should be transcribed in Traditional Chinsese. For example, Hmm should be replaced by 嗯."
+            response = openai.Audio.transcribe("whisper-1", f, initial_prompt=initial_prompt)
+            text = response['text']
+            print(text)
+            # transcripts.append(text)
+
+        except Exception as e:
+            print("Error:", str(e))
+            text = ""
+            # transcripts.append("")
+    
+    # remove the temporary WAV file
+    temp_file.unlink()
+    
+    return idx, text
+
+def speech_to_text(audio_sections, sections_times, opsegdir, threads = 1):
+    print(threads)
+
+    if threads > 1:
+        pbar = tqdm(total=len(sections_times))
+        results = []
+        def pbar_update(result):
+            results.append(result)
+            pbar.update(1)
+        
+        pool = mp.Pool(threads)
+        # sections = []
+        for idx, sections_time in enumerate(sections_times):
+            audio_section = audio_sections[idx]
+            pool.apply_async(_speech_to_text, args=(idx, audio_section, opsegdir), callback=pbar_update)
+            # sections.append(section)
+        pool.close()
+        pool.join()
+        
+        transcripts_dict = {}
+        for value in results:
+            idx, text = value
+            transcripts_dict[idx] = text
+
+    else:
+        transcripts_dict = {}
+        for idx, sections_time in tqdm(enumerate(sections_times)):
+            _, text = _speech_to_text(idx, audio_section, opsegdir)
+            transcripts_dict[idx] = text
+    
     transcripts = []
 
-    sections_length = len(audio_sections)
-    sections_length_digit = len(str(sections_length))
-
-    for i, section in tqdm(enumerate(audio_sections)):
-        # Save the section as a temporary WAV file
-        temp_file = Path('./temp_section.wav')
-        section.export(temp_file, format='wav')
-        section.export(opsegdir.joinpath(f's_{i:0{sections_length_digit}}.wav'), format='wav')
-        # Load the WAV file and convert to base64
-        with open(temp_file, 'rb') as f:
-            # Perform speech-to-text using the OpenAI API
-            try:
-                #initial_prompt = "Transcribe this audio to tranditional Chinese and English. pause fillers/filled pauses and particles should be in Chinese."
-                # initial_prompt = "本音檔是一個討論生物醫學研究、在美生活、求學生涯以及心理健康的對話。將本音檔產生繁體中# 文的逐字稿，音檔中的贅詞、填詞和語助詞應該用繁體中文表示。只有關鍵詞、人名以及專有名詞用英文表示。逐字稿不應# 該包含英文、繁體中文以外的字。少於兩秒的音檔只產生繁體中文。Hmm替代為嗯。"
-                initial_prompt = "This audio discusses biomedical research, experience in living abroad, and mental health. Please cerate a transcript of this audio mainly in traditional Chinese, only transcribe names, professional terms in both Traditional Chinese and English. Particals and filled pauses should be transcribed in Traditional Chinsese. For example, Hmm should be replaced by 嗯."
-                response = openai.Audio.transcribe("whisper-1", f, initial_prompt=initial_prompt)
-                text = response['text']
-                print(text)
-                transcripts.append(text)
-
-            except Exception as e:
-                print("Error:", str(e))
-                transcripts.append("")
-        
-        # remove the temporary WAV file
-        temp_file.unlink()
+    for idx, sections_tim in tqdm(enumerate(sections_times)):
+        transcripts.append(transcripts_dict[idx])
 
     return transcripts
 
@@ -75,11 +152,18 @@ def export_to_csv(times, transcripts, output_file='output.csv'):
     df = pd.concat(df, axis=0, ignore_index=True)
     df.to_csv(output_file, index=False)
 
-def process_audio_file(file_path, output_file, opsegdir, min_silence_len=400, silence_thresh=-40):
+def process_audio_file(file_path, output_file, opsegdir, tmpdir, 
+                       min_silence_len=400, silence_thresh=-40, threads = 1):
+    tmpdir.mkdir(parents=True, exist_ok=True)
     audio = import_audio_file(file_path)
-    sections, times = separate_sentences(audio, min_silence_len=min_silence_len, silence_thresh=silence_thresh)
-    transcripts = speech_to_text(sections, opsegdir)
-    export_to_csv(times, transcripts, output_file)
+    sections, sections_times = separate_sentences(
+        audio, opsegdir, tmpdir, 
+        min_silence_len=min_silence_len, 
+        silence_thresh=silence_thresh, threads = threads)
+    transcripts = speech_to_text(sections, sections_times, opsegdir, threads = threads)
+    export_to_csv(sections_times, transcripts, output_file)
+
+# ==========================
 
 def merge_tran_csv(csvdir, docdir, tag = ''):
     csvdir = Path(csvdir)
@@ -176,52 +260,95 @@ def break_up_file_to_chunks(filename, chunk_size=2000, overlap=100):
     
     return chunks
 
-def consolidate_summary(txtpath, oppath, names, max_tokens):
-    prompt_response = []
-
-    chunks = break_up_file_to_chunks(txtpath)
-    
+def _consolidate_summary(idx, chunk, names, max_tokens):
     encoding = tiktoken.get_encoding("gpt2")
+    # messages = [{"role": "system", "content": "This is text summarization."}]
+    if not names is None: 
+        names_str = "、".join(names)
+        addnames_prompt = f"參與者有以下幾位：{names_str}。"
+    else: 
+        addnames_prompt = ""
+    
+    messages = [{"role": "user", "content": f"這是一個podcast錄音的逐字稿。" + 
+                    addnames_prompt +
+                    f"請針對內容製作繁體中文的重點摘要，" + 
+                    f"並且將人名以及timestamp放在摘要句子的開頭 ，（順序依次為人名、timestamp、摘要）" +
+                    f"，例如：{names[0]}: timestamp 00:00:00: 這是摘要內容。" +
+                    ":\n"}]
+
+    prompt_request = "以下為內容: " + encoding.decode(chunk)
+    messages.append({"role": "user", "content": prompt_request})
+
+    response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
+            temperature=.5,
+            max_tokens=max_tokens,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
+    )
+    
+    prompt_response = response["choices"][0]["message"]['content'].strip()
+    return idx, prompt_response
+
+
+def consolidate_summary(txtpath, oppath, names, max_tokens, threads = 1):
+    
     chunks = break_up_file_to_chunks(txtpath)
-
     print(f"The length of chunks: {len(chunks)}")
-
-    for i, chunk in tqdm(enumerate(chunks)):
-        # messages = [{"role": "system", "content": "This is text summarization."}]
-        if names is None: 
-            messages = [{"role": "user", "content": f"這是一個podcast錄音的逐字稿。請針對內容製作繁體中文的重點摘要，並且將timestamp放在摘要句子的開頭:\n"}]
-        else: 
-            names_str = "、".join(names)
-            messages = [{"role": "user", "content": f"這是一個podcast錄音的逐字稿。參與者有以下幾位：{names_str}請針對內容製作繁體中文的重點摘要，並且將人名以及timestamp放在摘要句子的開頭 （順序依次為人名、timestamp、摘要）:\n"}]
-
-        prompt_request = "以下為內容: " + encoding.decode(chunk)
-        messages.append({"role": "user", "content": prompt_request})
-
-        response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=messages,
-                temperature=.5,
-                max_tokens=max_tokens,
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0
-        )
+    
+    if threads > 1:
+        pbar = tqdm(total=len(chunks))
+        results = []
+        def pbar_update(result):
+            results.append(result)
+            pbar.update(1)
         
-        prompt_response.append(response["choices"][0]["message"]['content'].strip())
+        pool = mp.Pool(threads)
+        # sections = []
+        for idx, chunk in enumerate(chunks):
+            pool.apply_async(_consolidate_summary, args=(idx, chunk, names, max_tokens), callback=pbar_update)
+        pool.close()
+        pool.join()
+        
+        prompt_response_dict = {}
+        for value in results:
+            idx, prompt_response = value
+            prompt_response_dict[idx] = prompt_response
 
+    else:
+        prompt_response_dict = {}
+        for idx, chunk in tqdm(enumerate(chunks)):
+            _, prompt_response = _consolidate_summary(idx, chunk, names, max_tokens)
+            prompt_response_dict[idx] = prompt_response
+
+    response = []
+    for i in range(len(chunks)):
+        response.append(prompt_response_dict[i])
+    
     with open(oppath, "w", encoding='utf-16') as f:
-        for i, response in tqdm(enumerate(prompt_response)):
+        for i, response in tqdm(enumerate(response)):
             # f.write(f'Summany {i+1}:\n')
             f.write(response)
             f.write('\n')
 
-    print(f"The length of chunks: {len(chunks)}")
     return 
 
-def openai_text(txtpath, summary_path, names = None):
+def openai_text(txtpath, summary_path, names = None, threads = 1):
 
-    consolidate_summary(txtpath, txtpath.parent.joinpath('tmp_summary_01.txt'), names = names, max_tokens = 300)
-    consolidate_summary(txtpath.parent.joinpath('tmp_summary_01.txt'), txtpath.parent.joinpath('tmp_summary_02.txt'), names = names, max_tokens = 400)
+    consolidate_summary(
+        txtpath, 
+        txtpath.parent.joinpath('tmp_summary_01.txt'), 
+        names = names, 
+        max_tokens = 300, 
+        threads = threads)
+    consolidate_summary(
+        txtpath.parent.joinpath('tmp_summary_01.txt'), 
+        txtpath.parent.joinpath('tmp_summary_02.txt'), 
+        names = names, 
+        max_tokens = 400, 
+        threads = threads)
 
     '''
     print(txtpath.parent.joinpath('tmp_summary_02.txt'))

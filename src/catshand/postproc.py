@@ -157,15 +157,16 @@ class postproc:
                         sample_width = wavtmp.dtype.itemsize, 
                         channels = 1)
                 
-                wavtmp_short = wavtmp[:10000000]
-                wavtmp_as_short = AudioSegment(
-                        wavtmp_short.tobytes(), 
-                        frame_rate = target_fs,
-                        sample_width = wavtmp_short.dtype.itemsize, 
-                        channels = 1)
+                wavtmp_as_downsample = wavtmp_as.set_frame_rate(600)
+                # wavtmp_short = wavtmp[:10000000]
+                # wavtmp_as_downsample = AudioSegment(
+                #         wavtmp_downsample.tobytes(), 
+                #         frame_rate = target_fs,
+                #         sample_width = wavtmp_downsample.dtype.itemsize, 
+                #         channels = 1)
                 
-                wavtmp_as_short_nosilence = self.remove_silence(wavtmp_as_short)
-                wavtmp_as_result = self.match_target_amplitude(wavtmp_as, wavtmp_as_short_nosilence, -20)
+                wavtmp_as_downsample_nosilence = self.remove_silence(wavtmp_as_downsample)
+                wavtmp_as_result = self.match_target_amplitude(wavtmp_as, wavtmp_as_downsample_nosilence, -20)
                 wavtmp_as_result = np.array(wavtmp_as_result.get_array_of_samples())
                 
                 self.logger.info(wavtmp_as_result.shape)
@@ -196,11 +197,16 @@ def match_target_amplitude(sound, sound_nosilence, target_dBFS):
     change_in_dBFS = target_dBFS - sound_nosilence.dBFS
     return sound.apply_gain(change_in_dBFS)
 
-def remove_silence(sound):
+def remove_silence(sound, min_silence_len = 1000, silence_thresh = -40, logger = None):
+    if logger is not None:
+        logger.info('start remove_silence')
     chunks = split_on_silence(
         sound, 
-        min_silence_len = 1000,
-        silence_thresh = -40
+        min_silence_len = min_silence_len,
+        silence_thresh = silence_thresh
     )
+    if logger is not None:
+        logger.info('end remove_silence')
+
     sound_result = sum(chunks)
     return sound_result

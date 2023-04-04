@@ -24,7 +24,6 @@ def add_subparser(subparsers):
     subparsers.add_argument('-i', '--prj_path', help = 'input folder for editing projects')
     subparsers.add_argument('-m', '--mat_path', help = 'the folder of editing materials')
     subparsers.set_defaults(func=audacitypipe)
-    # args = subparsers.parse_args()
     return
 
 # if __name__ == "__main__":

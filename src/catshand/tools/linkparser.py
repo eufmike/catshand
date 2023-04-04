@@ -23,8 +23,6 @@ def add_subparser(subparsers):
     description = 'linkparser collects the most recent podcast links.'
     subparsers = subparsers.add_parser('linkparser', help=description)
     subparsers.set_defaults(func=linkparser)
-    # parser = argparse.ArgumentParser(description=description)
-    # args = parser.parse_args()
     return
 
 # if __name__ == "__main__":

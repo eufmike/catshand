@@ -13,12 +13,17 @@ from catshand.utility import loggergen
 from catshand.openai import process_audio_file, merge_tran_csv, convert_csv_to_txt, openai_text
 
 def prjsummary(args):
-    ipdir = Path(args.input_dir)
+
     prjdir = Path(args.prj_dir)
     logger = loggergen(prjdir.joinpath('log'))
     threads = args.threads
 
     # check if output_dir specified
+    if not args.input_dir is None:
+        ipdir = Path(args.input_dir)
+    else:
+        ipdir = prjdir.joinpath('00_Raw_wav_processed_sil_removal')
+
     if not args.output_dir is None:
         opdir = Path(args.output_dir)
     else:
@@ -62,9 +67,9 @@ def add_subparser(subparsers):
     # parser = argparse.ArgumentParser(description=description)
     subparsers = subparsers.add_parser('prjsummary', help=description)
     required_group = subparsers.add_argument_group('Required Arguments')
-    required_group.add_argument('-i', '--input_dir', type = str, required = True, help = 'input folders with *.wav files.')
     required_group.add_argument('-p', '--prj_dir', type = str, required = True, help = 'directory for the project folder')
     optional_group = subparsers.add_argument_group('Optional Arguments')
+    optional_group.add_argument('-i', '--input_dir', type = str, help = 'input folders with *.wav files. Default folder: 00_Raw_wav_processed_sil_removal')
     optional_group.add_argument('-o', '--output_dir', type = str, help = 'output folders different from default')
     optional_group.add_argument('-t', '--threads', dest='threads', type=int, default = 1)
     subparsers.set_defaults(func=prjsummary)

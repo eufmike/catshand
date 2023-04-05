@@ -35,9 +35,11 @@ def section_audio(idx, audio, sections_time, opsegdir, tmpdir, sections_length_d
 
 def separate_sentences(audio, opsegdir, tmpdir, min_silence_len=500, silence_thresh=-40, threads = 1):
     
+    audio_lowbr = audio.set_frame_rate(8000)
+
     tmp_pkl = tmpdir.joinpath(opsegdir.name).with_suffix('.pkl')
     if not tmp_pkl.is_file():
-        sections_times = detect_nonsilent(audio, min_silence_len=min_silence_len, silence_thresh=silence_thresh)
+        sections_times = detect_nonsilent(audio_lowbr, min_silence_len=min_silence_len, silence_thresh=silence_thresh)
         with open(tmp_pkl, 'wb') as f:
             pickle.dump(sections_times, f)
         print('save pkl')
@@ -244,12 +246,15 @@ def convert_csv_to_txt(docdir, txtdir, chunck_size = 80):
     '''
     return
 
-def break_up_file_to_chunks(filename, chunk_size=2000, overlap=100):
+def break_up_file_to_chunks(filename = None, response_all = "", chunk_size=2000, overlap=100):
+
+    if len(response_all) == 0:
+        with open(filename, 'r', encoding='utf-16') as f:
+            text = f.read()
+    else: 
+        text = response_all
 
     encoding = tiktoken.get_encoding("gpt2")
-    with open(filename, 'r', encoding='utf-16') as f:
-        text = f.read()
-
     tokens = encoding.encode(text)
     num_tokens = len(tokens)
     
@@ -260,7 +265,7 @@ def break_up_file_to_chunks(filename, chunk_size=2000, overlap=100):
     
     return chunks
 
-def _consolidate_summary(idx, chunk, names, max_tokens):
+def _consolidate_summary(idx, chunk, names, max_tokens, name_timestamp):
     encoding = tiktoken.get_encoding("gpt2")
     # messages = [{"role": "system", "content": "This is text summarization."}]
     if not names is None: 
@@ -269,12 +274,14 @@ def _consolidate_summary(idx, chunk, names, max_tokens):
     else: 
         addnames_prompt = ""
     
+    if name_timestamp: 
+        nametimerule_prompt = f"並且將人名以及timestamp放在摘要句子的開頭 ，（順序依次為人名、timestamp、摘要），" + f"例如：{names[0]}: timestamp 00:00:00: 這是摘要內容。" 
+    else:
+        nametimerule_prompt = f"摘要內容需指出誰說的話，並把timestamp放在句尾" + f"例如：{names[0]}說的摘要內容部分一（00:00:00）{names[1]}說的摘要內容部分一（00:10:10） 。" 
+
     messages = [{"role": "user", "content": f"這是一個podcast錄音的逐字稿。" + 
-                    addnames_prompt +
-                    f"請針對內容製作繁體中文的重點摘要，" + 
-                    f"並且將人名以及timestamp放在摘要句子的開頭 ，（順序依次為人名、timestamp、摘要）" +
-                    f"，例如：{names[0]}: timestamp 00:00:00: 這是摘要內容。" +
-                    ":\n"}]
+                        addnames_prompt +
+                        f"請針對內容製作繁體中文的重點摘要，" + nametimerule_prompt + ":\n"}]
 
     prompt_request = "以下為內容: " + encoding.decode(chunk)
     messages.append({"role": "user", "content": prompt_request})
@@ -292,12 +299,7 @@ def _consolidate_summary(idx, chunk, names, max_tokens):
     prompt_response = response["choices"][0]["message"]['content'].strip()
     return idx, prompt_response
 
-
-def consolidate_summary(txtpath, oppath, names, max_tokens, threads = 1):
-    
-    chunks = break_up_file_to_chunks(txtpath)
-    print(f"The length of chunks: {len(chunks)}")
-    
+def _mp_consolidate_summary(chunks, names, max_tokens, name_timestamp, threads):
     if threads > 1:
         pbar = tqdm(total=len(chunks))
         results = []
@@ -308,7 +310,7 @@ def consolidate_summary(txtpath, oppath, names, max_tokens, threads = 1):
         pool = mp.Pool(threads)
         # sections = []
         for idx, chunk in enumerate(chunks):
-            pool.apply_async(_consolidate_summary, args=(idx, chunk, names, max_tokens), callback=pbar_update)
+            pool.apply_async(_consolidate_summary, args=(idx, chunk, names, max_tokens, name_timestamp), callback=pbar_update)
         pool.close()
         pool.join()
         
@@ -320,60 +322,64 @@ def consolidate_summary(txtpath, oppath, names, max_tokens, threads = 1):
     else:
         prompt_response_dict = {}
         for idx, chunk in tqdm(enumerate(chunks)):
-            _, prompt_response = _consolidate_summary(idx, chunk, names, max_tokens)
+            _, prompt_response = _consolidate_summary(idx, chunk, names, max_tokens, name_timestamp)
             prompt_response_dict[idx] = prompt_response
 
     response = []
     for i in range(len(chunks)):
         response.append(prompt_response_dict[i])
-    
-    with open(oppath, "w", encoding='utf-16') as f:
-        for i, response in tqdm(enumerate(response)):
-            # f.write(f'Summany {i+1}:\n')
-            f.write(response)
-            f.write('\n')
+    return response
 
-    return 
+
+def consolidate_summary(ippath, names, max_tokens, threads = 1, oppath = None, name_timestamp = True, max_total_tokens = None):
+    
+    if max_total_tokens is None:
+        chunks = break_up_file_to_chunks(ippath)
+        print(f"The length of chunks: {len(chunks)}")
+        response = _mp_consolidate_summary(chunks, names, max_tokens, name_timestamp, threads)
+    else:
+        x = 1
+        num_tokens = max_total_tokens + 1
+        response_all = ""
+        while num_tokens > max_total_tokens:
+            chunks = break_up_file_to_chunks(ippath, response_all)
+            print(f"The length of chunks: {len(chunks)}")
+
+            response = _mp_consolidate_summary(chunks, names, max_tokens, name_timestamp, threads)
+            response_all = " ".join(response)
+            encoding = tiktoken.get_encoding("gpt2")
+            tokens = encoding.encode(response_all)
+            num_tokens = len(tokens)
+            print(f'round: {x}, num_tokens: {num_tokens}')
+            x += 1
+
+    if not oppath is None:
+        with open(oppath, "w", encoding='utf-16') as f:
+            for i, response in tqdm(enumerate(response)):
+                # f.write(f'Summany {i+1}:\n')
+                f.write(response)
+                f.write('\n')
+    return response
 
 def openai_text(txtpath, summary_path, names = None, threads = 1):
-
+    
     consolidate_summary(
-        txtpath, 
-        txtpath.parent.joinpath('tmp_summary_01.txt'), 
+        ippath = txtpath, 
+        oppath = txtpath.parent.joinpath('tmp_summary_01.txt'),
         names = names, 
         max_tokens = 300, 
         threads = threads)
-    consolidate_summary(
-        txtpath.parent.joinpath('tmp_summary_01.txt'), 
-        txtpath.parent.joinpath('tmp_summary_02.txt'), 
+    summary = consolidate_summary(
+        ippath = txtpath.parent.joinpath('tmp_summary_01.txt'), 
         names = names, 
-        max_tokens = 400, 
+        max_tokens = 2000,
+        max_total_tokens = 4000,
+        name_timestamp = False, 
         threads = threads)
 
-    '''
-    print(txtpath.parent.joinpath('tmp_summary_02.txt'))
-    with open(txtpath.parent.joinpath('tmp_summary_02.txt'), 'r', encoding='utf-16') as f:
-        prompt_response = f.read()
-    
-    prompt_request = f"濃縮以下的重點摘要並輸出繁體中文的內容： {prompt_response}"
-    print(prompt_request)
-    
-    messages = [{"role": "user", "content": prompt_request}]
-    # messages.append({"role": "user", "content": prompt_request})
-
-    response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            temperature=.5,
-            max_tokens=4000,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0
-    )
-    # meeting_summary = response["choices"][0]["text"].strip()
-    meeting_summary = response["choices"][0]["message"]['content'].strip()
-    print(meeting_summary)
     with open(summary_path, "w", encoding='utf-16') as f:
-        f.write(meeting_summary)
-    '''
+        for i, paragraph in tqdm(enumerate(summary)):
+            f.write(paragraph)
+            f.write('\n')
+
     return

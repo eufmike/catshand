@@ -3,6 +3,9 @@ from pathlib import Path
 import numpy as np
 import logging
 import librosa
+from tqdm import tqdm
+import multiprocessing as mp
+mp.set_start_method('fork', force=True)
 from scipy.io.wavfile import read, write
 from scipy.signal import resample
 from pydub import AudioSegment
@@ -18,7 +21,7 @@ class postproc:
         with open(prjconfig_path) as f:
             self.prjconfig = json.load(f)       
         
-        with open(Path(__file__).parent.joinpath('hosts.json')) as f:
+        with open(Path(__file__).parent.joinpath('config', 'hosts_dict.json')) as f:
             self.hostsnameidx = json.load(f)
         
         config_fld = prjconfig_path.parent
@@ -85,7 +88,65 @@ class postproc:
         change_in_dBFS = target_dBFS - sound_nosilence.dBFS
         return sound.apply_gain(change_in_dBFS)
 
-    def wav2mergemono(self, target_fs = 44100):
+    def _wav2mergemono(self, name, target_fs, loudness):
+        self.logger.info(name)
+        if not self.opfilelist[name].is_file():
+
+            sound_combined = AudioSegment.empty()
+            for section in self.folderlist:
+                wavfile = self.ipfilelist_dict[name][section][0]
+                self.logger.info(str(wavfile))
+                
+                # fs, data = read(str(wavfile))
+                sound = AudioSegment.from_file(str(wavfile))
+                sound = sound.set_channels(1)
+                sound = sound.set_frame_rate(target_fs)           
+                max_length_second = float(self.mainmetadata_dict['maxlength'][section])
+                
+                max_length_ms = max_length_second * 1000
+                if max_length_ms >= len(sound):
+                    silence = AudioSegment.silent(duration=max_length_ms-len(sound))
+                    sound = sound + silence
+                else:
+                    sound = sound[:max_length_ms]
+
+                
+                sound_combined = sound_combined + sound
+
+            if loudness: 
+                sound_combined_downsample = sound_combined.set_frame_rate(600)
+                sound_combined_downsample_nosilence = self.remove_silence(sound_combined_downsample)
+                sound_combined = self.match_target_amplitude(sound_combined, sound_combined_downsample_nosilence, -20)
+            
+            self.logger.info(len(sound_combined))
+            sound_combined.export(self.opfilelist[name], format="wav", bitrate=target_fs)
+        
+        self.logger.info(f'mainmetadata_dict: {self.mainmetadata_dict}')
+        return
+
+    def _mp_wav2mergemono(self, target_fs, loudness, threads):
+
+        if threads > 1:
+            pbar = tqdm(total=len(self.namelistorder))
+            results = []
+            def pbar_update(result):
+                results.append(result)
+                pbar.update(1)
+            
+            pool = mp.Pool(threads)
+            # sections = []
+            for name in self.namelistorder:
+                pool.apply_async(self._wav2mergemono, args=(name, target_fs, loudness), callback=pbar_update)
+            pool.close()
+            pool.join()
+
+        else:
+            for name in tqdm(self.namelistorder):
+                self._wav2mergemono(name, target_fs, loudness)
+            
+        return
+
+    def wav2mergemono(self, target_fs = 32000, loudness = False, threads = 1):
         with open(self.metadata_path, 'r') as f:
             self.mainmetadata_dict = json.load(f)
 
@@ -108,71 +169,7 @@ class postproc:
             json.dump(self.mainmetadata_dict, f, indent=2, sort_keys=True)
             f.truncate()      
         
-        for name in self.namelistorder:
-            self.logger.info(name)
-            if not self.opfilelist[name].is_file():
-                wavtmp = []
-                for section in self.folderlist:
-                    wavfile = self.ipfilelist_dict[name][section][0]
-                    self.logger.info(str(wavfile))
-                    
-                    fs, data = read(str(wavfile))
-                    if data.ndim == 2:
-                        data = data[:, 0]
-                        
-                    if data.dtype == 'int32':
-                        #data = data.astype(np.float32, order='C') / 2147483647
-                        data = data / 2147483647 * 32768
-                        data = data.astype(np.int16, order='C') 
-                        
-                    if fs != target_fs:
-                        fs_factor = target_fs / fs
-                        target_length = int(len(data)*fs_factor)
-                        data = data.astype('float')
-                        data = librosa.resample(data, fs, target_fs)
-                        data = data.astype(np.int16, order='C') 
-                    else:
-                        fs_factor = 1
-                    
-                    max_length = int(float(self.mainmetadata_dict['maxlength'][section]) * target_fs)
-                    new_length = data.shape[0]
-                    self.logger.info(f'max_length:{max_length}')
-                    self.logger.info(f'new_length:{new_length}')
-                    if (max_length - new_length) > 0:
-                        data_tmp = np.pad(data, (0, int(max_length - new_length)), 'constant')
-                    else:
-                        data_tmp = data
-                        
-                    # print(np.max(data_tmp), np.min(data_tmp))
-                    self.logger.info(data_tmp.dtype)
-                    
-                    wavtmp.append(data_tmp)
-                
-                wavtmp = np.concatenate(wavtmp, axis = 0)
-                self.logger.info(wavtmp.shape)
-                
-                wavtmp_as = AudioSegment(
-                        wavtmp.tobytes(), 
-                        frame_rate = target_fs,
-                        sample_width = wavtmp.dtype.itemsize, 
-                        channels = 1)
-                
-                wavtmp_as_downsample = wavtmp_as.set_frame_rate(600)
-                # wavtmp_short = wavtmp[:10000000]
-                # wavtmp_as_downsample = AudioSegment(
-                #         wavtmp_downsample.tobytes(), 
-                #         frame_rate = target_fs,
-                #         sample_width = wavtmp_downsample.dtype.itemsize, 
-                #         channels = 1)
-                
-                wavtmp_as_downsample_nosilence = self.remove_silence(wavtmp_as_downsample)
-                wavtmp_as_result = self.match_target_amplitude(wavtmp_as, wavtmp_as_downsample_nosilence, -20)
-                wavtmp_as_result = np.array(wavtmp_as_result.get_array_of_samples())
-                
-                self.logger.info(wavtmp_as_result.shape)
-                write(self.opfilelist[name], target_fs, wavtmp_as_result)
-        
-        self.logger.info(f'mainmetadata_dict: {self.mainmetadata_dict}')
+        self._mp_wav2mergemono(target_fs, loudness = loudness, threads=threads)
         
         return
 

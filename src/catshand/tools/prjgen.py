@@ -6,45 +6,48 @@ from catshand.utility import loggergen, configgen
 
 def prjgen(args):
     print(args)
-    root_dir = args.root_dir
+    rootdir = args.root_dir
     prj_n = args.project_name
-    prj_dir = Path(root_dir, prj_n)
+    prjdir = Path(rootdir, prj_n)
     mat_dir = args.material_dir
     if mat_dir is not None:
         mat_dir = Path(mat_dir)
  
-    if prj_dir.is_dir():
+    if prjdir.is_dir():
         if not click.confirm(f'Project folder already exists, Continue?', default=True):
             return
     
-    logger = loggergen(prj_dir.joinpath('log'))
+    logdir = prjdir.joinpath('log')
+    logdir.mkdir(exist_ok=True, parents=True)
+    logger = loggergen(logdir)
+    logger.info(f'args: {args}')
 
-    if not prj_dir.is_dir():
-        prj_dir.mkdir(exist_ok = True, parents=True)
-        logger.info(f'Craete the project folder: {prj_dir}')
+    if not prjdir.is_dir():
+        prjdir.mkdir(exist_ok = True, parents=True)
+        logger.info(f'Craete the project folder: {prjdir}')
     else: 
         logger.info(f'Project folder exists')
 
-    if not prj_dir.joinpath('log').is_dir():
-        prj_dir.joinpath('log').mkdir(exist_ok = True, parents=True)
-        logger.info(f'Craete the log folder: {prj_dir.joinpath("log")}')
+    if not prjdir.joinpath('log').is_dir():
+        prjdir.joinpath('log').mkdir(exist_ok = True, parents=True)
+        logger.info(f'Craete the log folder: {prjdir.joinpath("log")}')
     else: 
         logger.info(f'Log folder exists')
 
-    if not prj_dir.joinpath('config').is_dir():
-        prj_dir.joinpath('config').mkdir(exist_ok = True, parents=True)
-        logger.info(f'Craete the config folder: {prj_dir.joinpath("config")}')
+    if not prjdir.joinpath('config').is_dir():
+        prjdir.joinpath('config').mkdir(exist_ok = True, parents=True)
+        logger.info(f'Craete the config folder: {prjdir.joinpath("config")}')
     else: 
         logger.info(f'Config folder exists')
 
-    if not prj_dir.joinpath('config', 'config.json').is_file():
-        configgen(prj_dir)
+    if not prjdir.joinpath('config', 'config.json').is_file():
+        configgen(prjdir)
     else: 
         logger.info(f'Config.json exists')
 
     if mat_dir is None: return
     
-    json_path = prj_dir.joinpath('config', 'audt_config.json')
+    json_path = prjdir.joinpath('config', 'audt_config.json')
 
     if json_path.is_file():
         if click.confirm(f'audt_config.json already exists, Overwrite?', default=True):

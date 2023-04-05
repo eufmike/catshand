@@ -163,7 +163,9 @@ def audio2wav(args):
     finetune = args.finetune
     threads = args.threads
 
-    logger = loggergen(prjdir.joinpath('log'))
+    logdir = prjdir.joinpath('log')
+    logdir.mkdir(exist_ok=True, parents=True)
+    logger = loggergen(logdir)
     logger.info(f'args: {args}')
 
     # create input file list
@@ -203,7 +205,6 @@ def audio2wav(args):
         pool.join()
 
     else:
-        prompt_response_dict = {}
         for ipfile, opfile, opfile_noeffect in tqdm(zip(ipfilelist, opfilelist, opfilelist_noeffect)):
             _effects(ipfile, opfile, opfile_noeffect, bitrate, logger, loudness, compressor, noisereduce, finetune)
             

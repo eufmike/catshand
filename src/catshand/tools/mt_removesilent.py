@@ -145,8 +145,10 @@ def mt_removesilent(args):
     else:
         opdir = prjdir.joinpath(ipdir.name + '_sil_removal')
 
-    opdir.mkdir(exist_ok=True, parents=True)
-    logger = loggergen(prjdir.joinpath('log'))
+    logdir = prjdir.joinpath('log')
+    logdir.mkdir(exist_ok=True, parents=True)
+    logger = loggergen(logdir)
+    logger.info(f'args: {args}')
     
     pad_zero = args.pad_zero
     threads = args.threads

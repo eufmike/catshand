@@ -15,7 +15,12 @@ from catshand.openai import process_audio_file, merge_tran_csv, convert_csv_to_t
 def prjsummary(args):
 
     prjdir = Path(args.prj_dir)
-    logger = loggergen(prjdir.joinpath('log'))
+    
+    logdir = prjdir.joinpath('log')
+    logdir.mkdir(exist_ok=True, parents=True)
+    logger = loggergen(logdir)
+    logger.info(f'args: {args}')
+
     threads = args.threads
 
     # check if output_dir specified

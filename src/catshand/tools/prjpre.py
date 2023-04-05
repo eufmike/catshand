@@ -11,14 +11,18 @@ from scipy.io.wavfile import read, write
 def prjpre(args):
     print(args)
 
-    ip_dir = Path(args.input_dir)
-    prj_dir = Path(args.prj_dir)
-    op_dir =  prj_dir.joinpath('01_Preprocessing')
+    ipdir = Path(args.input_dir)
+    prjdir = Path(args.prj_dir)
+    op_dir =  prjdir.joinpath('01_Preprocessing')
     csv_path = Path(args.csv)
     filetype = args.input_format
-    logger = loggergen(prj_dir.joinpath('log'))
 
-    ipfllist = sorted(ip_dir.glob(f'*{filetype}'))
+    logdir = prjdir.joinpath('log')
+    logdir.mkdir(exist_ok=True, parents=True)
+    logger = loggergen(logdir)
+    logger.info(f'args: {args}')
+
+    ipfllist = sorted(ipdir.glob(f'*{filetype}'))
     df_split = pd.read_csv(csv_path)
     
     op_dir.mkdir(exist_ok = True, parents = True)

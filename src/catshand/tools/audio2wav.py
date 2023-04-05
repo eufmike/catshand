@@ -182,8 +182,6 @@ def audio2wav(args):
         opfilelist_names_new = matchname_opfilelist(ipfilelist, prjdir, logger)
         opfilelist = [opfln_old.parent.joinpath(opfln_new).with_suffix('.wav') for opfln_old, opfln_new in zip(opfilelist, opfilelist_names_new)]
         opfilelist_noeffect = [opfln_old.parent.joinpath(opfln_new).with_suffix('.wav') for opfln_old, opfln_new in zip(opfilelist_noeffect, opfilelist_names_new)]
-        # opfilelist = [opdir.joinpath(ipfile.relative_to(ipdir)).with_suffix('.wav') for ipfile, opfilename in zip(ipfilelist, opfilelist_names_new)]
-        # opfilelist_noeffect = [Path(opdir_wavnoeffect).joinpath(x).with_suffix('.wav') for x in opfilelist_names_new]
     elif matchname & (prjdir is None):
         raise ValueError('prj_dir is not specified, cannot match name')
 
@@ -198,7 +196,6 @@ def audio2wav(args):
             pbar.update(1)
         
         pool = mp.Pool(threads)
-        # sections = []
         for ipfile, opfile, opfile_noeffect in zip(ipfilelist, opfilelist, opfilelist_noeffect):
             pool.apply_async(_effects, args=(ipfile, opfile, opfile_noeffect, bitrate, logger, loudness, compressor, noisereduce, finetune), callback=pbar_update)
         pool.close()

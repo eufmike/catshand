@@ -1,5 +1,7 @@
 import argparse
-from catshand.tools import audio2wav, prjgen, prjpre, prjpost, audacitypipe, highlight, audmerger, linkparser, prjsummary, mt_removesilent, cleanvoice
+from catshand.tools import audio2wav, prjgen, prjpre, \
+    prjpost, audacitypipe, highlight, audmerger, linkparser, \
+    prjsummary, mt_removesilent, cleanvoice, trackmerger
 
 def main():
     description = "Cat's Hand (catshand) is a toolbox designed for audio editing and production in the team of Tripod Cat's Podcast. Cat's Hand (catshand) is named after the Japanese idiom \"猫の手も借りたい\", which means \"so busy someone wants to borrow even the paw of a cat.\""
@@ -12,6 +14,7 @@ def main():
     prjsummary.add_subparser(subparsers)
     cleanvoice.add_subparser(subparsers)
     prjpre.add_subparser(subparsers)
+    trackmerger.add_subparser(subparsers)
     prjpost.add_subparser(subparsers)
     audacitypipe.add_subparser(subparsers)
     audmerger.add_subparser(subparsers)

@@ -1,6 +1,6 @@
 import argparse
 from catshand.tools import audio2wav, prjgen, prjpre, \
-    prjpost, audacitypipe, highlight, audmerger, linkparser, \
+    audacitypipe, audmerger, linkparser, \
     prjsummary, mt_removesilent, cleanvoice, trackmerger
 
 def main():
@@ -15,10 +15,8 @@ def main():
     cleanvoice.add_subparser(subparsers)
     prjpre.add_subparser(subparsers)
     trackmerger.add_subparser(subparsers)
-    prjpost.add_subparser(subparsers)
     audacitypipe.add_subparser(subparsers)
     audmerger.add_subparser(subparsers)
-    highlight.add_subparser(subparsers)
     linkparser.add_subparser(subparsers)
     
     args = parser.parse_args()

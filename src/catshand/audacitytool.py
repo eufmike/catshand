@@ -19,60 +19,47 @@ def importfiles(filepath):
     return
 
 class audacitytool:
-    def __init__(self, prj_path, mat_path):
+    def __init__(self, prj_path, ip_dir = None):
         self.prjpath = Path(prj_path)
-        self.matpath = Path(mat_path)
+        # self.matpath = Path(mat_path)
         self.audtconfigpath = self.prjpath.joinpath('config', 'audt_config.json')
         self.configpath = self.prjpath.joinpath('config', 'config.json')
         
-        self.OPMUSIC_PATH = str(self.matpath.joinpath('direct_import', 'direct_import_op.wav'))
-        self.ENDMUSIC_PATH = str(self.matpath.joinpath('direct_import', 'direct_import_end.wav'))
-        self.ENDCREDIT_PATH = str(self.matpath.joinpath('direct_import', 'direct_import_endcredit_TCGA_edited.wav'))
-        
         # load config
-        if self.configpath.is_file():
-            with open(self.configpath, 'r') as f: 
-                self.config = json.load(f)
-            
-            self.PROJECTNAME = self.config['project_name']
-            self.HOSTS = self.config['hosts']
-            self.GUESTS = self.config['guests']
-        else: 
-            configgen(self.prjpath)
+        if not self.configpath.is_file():
+            raise Exception("config file not found. Please run 'prjgen' command first to create the config file.")
+        else:
+            with open(self.configpath, 'r') as f:
+                config_dict = json.load(f)
+        self.config = config_dict
+        self.PROJECTNAME = config_dict.get('project_name')
+        self.HOSTS = config_dict.get('hosts')
+        self.GUESTS = config_dict.get('guests')
+        if ip_dir is None: 
+            self.IPFOLDER = self.prjpath.joinpath('03_Editing_02_wav_merged')
+        else:
+            self.IPFOLDER = ip_dir
+        self.HIGHLIGHTFLD = self.prjpath.joinpath('05_Highlight_wav')
+        self.HIGHLIGHTPATH = sorted(self.HIGHLIGHTFLD.glob(f'*.wav'))[0]
             
         self.namesall = self.HOSTS + self.GUESTS
         
         # load audtconfig
-        if self.audtconfigpath.is_file():
-            with open(self.audtconfigpath, 'r') as f:
-                self.audtconfig = json.load(f)
-            self.TRACK_HEIGHT = self.audtconfig.get('track_height')
-            self.TRACK_OFFSET = self.audtconfig.get('track_offset')
-            self.HIGHLIGHT_OFFSET = self.audtconfig.get('highlight_offset')
-            self.ENDCREDIT_OFFSET = self.audtconfig.get('endcredt_offset')
-            self.ENDMUSIC_OFFSET = self.audtconfig.get('endmusic_offset')
-                    
-        else: 
-            self.TRACK_HEIGHT = 80
-            self.TRACK_OFFSET = 29.6
-            self.HIGHLIGHT_OFFSET = 10
-            self.ENDCREDIT_OFFSET = 9.2
-            self.ENDMUSIC_OFFSET = -4
-            
-            self.audtconfig = {
-                'track_height': self.TRACK_HEIGHT, 
-                'track_offset': self.TRACK_OFFSET,
-                'highlight_offset': self.HIGHLIGHT_OFFSET,
-                'endcredt_offset': self.ENDCREDIT_OFFSET, 
-                'endmusic_offset':self.ENDMUSIC_OFFSET,
-                'opmusic_path': self.OPMUSIC_PATH, 
-                'endmusic_path': self.ENDMUSIC_PATH, 
-                'endcredit_path': self.ENDCREDIT_PATH, 
-            }
-            
-            with open(self.audtconfigpath, 'w') as f:
-                json.dump(self.audtconfig, f, indent=2, sort_keys=False)
+        with open(self.audtconfigpath, 'r') as f:
+            self.audtconfig = json.load(f)
+
+        self.TRACK_HEIGHT = self.audtconfig.get('track_height')
+        self.TRACK_OFFSET = self.audtconfig.get('track_offset')
+        self.HIGHLIGHT_OFFSET = self.audtconfig.get('highlight_offset')
+        self.ENDCREDIT_OFFSET = self.audtconfig.get('endcredt_offset')
+        self.ENDMUSIC_OFFSET = self.audtconfig.get('endmusic_offset')
         
+        material_dict = self.audtconfig.get('material')
+        material_root = Path(material_dict.get('root'))
+        self.OPMUSIC_PATH = material_root.joinpath(material_dict.get('opmusic_path'))
+        self.ENDMUSIC_PATH = material_root.joinpath(material_dict.get('endmusic_path'))
+        self.ENDCREDIT_PATH = material_root.joinpath(material_dict.get('endcredit_path'))
+        self.TRANSITIONFLD = material_root.joinpath(material_dict.get('transition_path'))
         return
         
     def importrecording(self):
@@ -87,7 +74,7 @@ class audacitytool:
             track_name = f'{prj_name}_{name}'
             if track_name not in tracknamelist:
                 print(f'import track: {track_name}')
-                importfiles(self.prjpath.joinpath('postedit_merged', f'{track_name}.wav'))
+                importfiles(self.IPFOLDER.joinpath(f'{track_name}.wav'))
             do_command('SelectAll:')        
             do_command(f'SelectTracks: Mode="Set" Track="{idx}" TrackCount="1"')
             do_command('ZoomSel')
@@ -98,21 +85,20 @@ class audacitytool:
     
     def importhighlight(self):
         hl_name = 'highlight'
-        highlight_path = Path('highlight_export', f'{hl_name}.wav')
-        
+        highlight_path = str(self.HIGHLIGHTPATH)
+        print(highlight_path)
         trackinfos = getinfo2json()
         tracknamelist = [trackinfo['name'] for trackinfo in trackinfos]
         
         if hl_name not in tracknamelist:
             print(f'import highlight: {highlight_path}')
-            importfiles(self.prjpath.joinpath(highlight_path))
+            importfiles(highlight_path)
             
             do_command('SelectAll:')
             do_command(f'SelectTracks: Mode="Set" Track="{len(self.namesall)+3}" TrackCount="1"')
             do_command(f'SetTrack: Height={self.TRACK_HEIGHT}')
             do_command(f'SetClip: At="0" Start="{self.HIGHLIGHT_OFFSET}"')
             
-
         return
     
     def importmaterial(self):
@@ -158,15 +144,15 @@ class audacitytool:
         with open(self.metadatapath, 'r') as f:
             medatadict = json.load(f)
         
-        self.posteditrawpath = self.prjpath.joinpath('postedit_raw')
+        self.posteditrawpath = self.prjpath.joinpath('03_Editing_02_wav')
         folderlist = sorted(self.posteditrawpath.iterdir())
         self.foldernamelist = [x.name for x in folderlist]        
         
         fs = medatadict['op_fs']
         
         section_length = []
-        for idx in range(len(self.foldernamelist)):
-            maxlength = float(medatadict['maxlength'][str(idx+1).zfill(2)])  
+        for idx, foldername in enumerate(self.foldernamelist):
+            maxlength = float(medatadict['maxlength'][foldername])  
             section_length.append(int(maxlength * fs))
             
         breakmusic_time = [0]
@@ -225,7 +211,7 @@ class audacitytool:
         for index, row in self.dfaddmusic.iterrows():
             hhmmss = row['timestamp']
             filename = row['music']
-            self.MIDDLEPATH = self.matpath.joinpath('02_transition', filename)
+            self.MIDDLEPATH = self.TRANSITIONFLD.joinpath(filename)
 
             [hours, minutes, seconds] = [x for x in hhmmss.split(':')]
             print(f'{hours}; {minutes}; {seconds}')

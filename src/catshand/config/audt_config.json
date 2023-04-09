@@ -7,6 +7,7 @@
     "material": {
         "opmusic_path":"direct_import/direct_import_op.wav",
         "endmusic_path": "direct_import/direct_import_end.wav",
-        "endcredit_path": "direct_import/direct_import_endcredit_TCGA_edited.wav"
+        "endcredit_path": "direct_import/direct_import_endcredit_TCGA_edited.wav",
+        "transition_path": "02_transition"
     }
 }

@@ -19,19 +19,48 @@ def getpipename():
         EOL = '\n'
     return TONAME, FROMNAME, EOL
 
-def LaunchAudacity(sleeptime = 0.5):
+def notify(title, text):
+    os.system("""
+    osascript -e 'display notification "{}" with title "{}"'
+    """.format(text, title))
+
+def LaunchAudacity_win(sleeptime = 0.5):
     if click.confirm('Do you want to launch Audacity?', default=True):
-        if sys.platform == 'win32':
-            sp.Popen(["C:\Program Files\Audacity\Audacity.exe"])
+        sp.Popen(["C:\Program Files\Audacity\Audacity.exe"])
     else:
         sys.exit()
     sleep(sleeptime)
+    return
+
+def LaunchAudacity_mac(sleeptime = 3):
+    if click.confirm('Do you want to launch Audacity?', default=True):
+        process_name= "Audacity" # change this to the name of your process
+        tmp = os.popen("ps -Af").read()
+        if process_name not in tmp[:]:
+            print (f"The {process_name} is not running. Let's restart.")
+            """"Use nohup to make sure it runs like a daemon"""
+            
+            notify(f"{process_name} is Down", f"Restarting {process_name} now.")
+            
+            sp.call(
+            ["/usr/bin/open", "-a", f"/Applications/{process_name}.app"]
+            )
+        else:
+            print(f"The {process_name} is running.")
+    else:
+        sys.exit()
+    sleep(sleeptime)
+    return
 
 def checkpipe(TONAME, FROMNAME, launchstate = False):
     print("Write to  \"" + TONAME +"\"")
     if os.path.exists(TONAME) and os.path.exists(FROMNAME):
         print(f"-- Both {TONAME} and {FROMNAME} exist. Good.")
-        return
+        if sys.platform == 'win32':
+            return
+        tmp = os.popen("ps -Af").read()
+        if "Audacity" in tmp[:]:
+            return
     elif (not os.path.exists(TONAME)) and (not os.path.exists(FROMNAME)):
         print(f"-- {TONAME} and {FROMNAME} do not exist")
     elif not os.path.exists(TONAME):
@@ -39,12 +68,18 @@ def checkpipe(TONAME, FROMNAME, launchstate = False):
     else:
         print(f"--{FROMNAME} do not exist") 
     
-    if not launchstate:
-        LaunchAudacity()
-        sleep(5)
-        launchstate = True
-    checkpipe(TONAME, FROMNAME, launchstate = launchstate)
-    
+    if sys.platform == 'win32':
+        if not launchstate:
+            LaunchAudacity()
+            sleep(5)
+            launchstate = True
+        checkpipe(TONAME, FROMNAME, launchstate = launchstate)
+    elif sys.platform == 'darwin':
+        if not launchstate:
+            LaunchAudacity_mac()
+            sleep(5)
+            launchstate = True
+        checkpipe(TONAME, FROMNAME, launchstate = launchstate)
     return
 
 #-------------------------------------------

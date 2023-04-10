@@ -19,14 +19,6 @@ def audmerger(args):
     prjconfig_path = prjdir.joinpath('config', 'config.json')
     loudness = args.loudness
     threads = args.threads
-
-    # ip_path = args.input_dir
-    # op_path = args.output_dir
-    # prjconfig_path = args.prjconfig_path
-
-    # ip_path = Path(ip_path)
-    # op_path = Path(op_path)
-    # prjconfig_path = Path(prjconfig_path)
     
     if not prjconfig_path.is_file():
         configgen(prjconfig_path.parents[1])

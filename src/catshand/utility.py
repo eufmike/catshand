@@ -39,14 +39,14 @@ def loggergen(logfld = None):
     logger = logging.getLogger()
     return logger
 
-def timestamp2arrayidx(timestamp, fs):
+def timestamp2arrayidx(timestamp):
     timestamp_list = timestamp.split(':')
     hr = int(timestamp_list[0])
     min = int(timestamp_list[1])
     sec = int(timestamp_list[2])
     # print(f'hr: {hr}, min:{min}, sec:{sec}')
     sec_total = hr*60*60 + min*60 + sec
-    return sec_total * fs
+    return sec_total * 1000
 
 def wavcut(arrayidx_list_ip, wav_data):
     # print(wav_data.shape)
@@ -107,4 +107,15 @@ def configgen(prjpath):
         json.dump(json_pars, f, indent=2, sort_keys=False)
     return   
 
+def asktimes(amount):
+    timestamps = []
+    for i in range(amount):
+        timestamp = click.prompt(f'Timepoint {i + 1} (HH:MM:SS, example: 01:02:03): ', type = str)
+        timestamps.append(timestamp)
+    return timestamps
+
+def timestampgen():
+    count_times = click.prompt('The amount of splitting timepoint', type = int)
+    timestamps = asktimes(count_times)
+    return timestamps
 

@@ -8,8 +8,9 @@ def audacitypipe(args):
 
     prj_path = args.prj_path
     ip_dir = args.input_dir
+    hl_dir = args.highlight_dir
 
-    audtl = audacitytool(prj_path, ip_dir)
+    audtl = audacitytool(prj_path, ip_dir, hl_dir)
     audtl.importrecording()
     audtl.importmaterial()
     audtl.importhighlight()
@@ -25,7 +26,8 @@ def add_subparser(subparsers):
     required_group.add_argument('-p', '--prj_path', help = 'input folder for editing projects')
     # required_group.add_argument('-m', '--mat_path', help = 'the folder of editing materials')
     optional_group = subparsers.add_argument_group('Optional Arguments')
-    optional_group.add_argument('-i', '--input_dir', type = str, help = 'input folders with wav files.')
+    optional_group.add_argument('-i', '--input_dir', type = str, default = '03_Editing_02_wav_merged', help = 'input folders with wav files.')
+    optional_group.add_argument('-hl', '--highlight_dir', type = str, default = '05_Highlight_wav', help = 'input folders with wav files.')
     subparsers.set_defaults(func=audacitypipe)
     
     return

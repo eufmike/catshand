@@ -12,14 +12,15 @@ def getinfo2json():
     result = json.loads(response)
     return(result)
 
-def importfiles(filepath):
+def importfiles(filepath, compressor = True):
     do_command(f'Import2: Filename={filepath}')
-    do_command(f'Compressor: Threshold={str(-40)} NoiseFloor={str(-35)} Ratio={str(2)}')
-    # do_command(f'Compressor: Threshold={str(-56)} NoiseFloor={str(-35)} Ratio={str(5.3)}')
+    if compressor:
+        do_command(f'Compressor: Threshold={str(-40)} NoiseFloor={str(-35)} Ratio={str(2)}')
+        # do_command(f'Compressor: Threshold={str(-56)} NoiseFloor={str(-35)} Ratio={str(5.3)}')
     return
 
 class audacitytool:
-    def __init__(self, prj_path, ip_dir = None):
+    def __init__(self, prj_path, ip_dir = None, hl_dir = None):
         self.prjpath = Path(prj_path)
         # self.matpath = Path(mat_path)
         self.audtconfigpath = self.prjpath.joinpath('config', 'audt_config.json')
@@ -35,15 +36,8 @@ class audacitytool:
         self.PROJECTNAME = config_dict.get('project_name')
         self.HOSTS = config_dict.get('hosts')
         self.GUESTS = config_dict.get('guests')
-        if ip_dir is None: 
-            self.IPFOLDER = self.prjpath.joinpath('03_Editing_02_wav_merged')
-        else:
-            self.IPFOLDER = ip_dir
-        self.HIGHLIGHTFLD = self.prjpath.joinpath('05_Highlight_wav')
-        self.HIGHLIGHTPATH = sorted(self.HIGHLIGHTFLD.glob(f'*.wav'))[0]
-            
         self.namesall = self.HOSTS + self.GUESTS
-        
+
         # load audtconfig
         with open(self.audtconfigpath, 'r') as f:
             self.audtconfig = json.load(f)
@@ -60,9 +54,19 @@ class audacitytool:
         self.ENDMUSIC_PATH = material_root.joinpath(material_dict.get('endmusic_path'))
         self.ENDCREDIT_PATH = material_root.joinpath(material_dict.get('endcredit_path'))
         self.TRANSITIONFLD = material_root.joinpath(material_dict.get('transition_path'))
+
+        # set path 
+        if not ip_dir is None: 
+            self.IPFOLDER = self.prjpath.joinpath(ip_dir)
+
+        if not hl_dir is None: 
+            self.HIGHLIGHTFLD = self.prjpath.joinpath(hl_dir)
+            self.HIGHLIGHTPATH = sorted(self.HIGHLIGHTFLD.glob(f'*.wav'))[0]
+
         return
         
-    def importrecording(self):
+    def importrecording(self, importall = False, ipformat = '.wav', 
+                        add_offset = True, compressor = True):
         print(self.config)
         prj_name = self.PROJECTNAME
         self.ipwavlist = {}
@@ -70,16 +74,21 @@ class audacitytool:
         trackinfos = getinfo2json()
         tracknamelist = [trackinfo['name'] for trackinfo in trackinfos]
         
-        for idx, name in enumerate(self.namesall):
-            track_name = f'{prj_name}_{name}'
+        if importall:
+            track_names = sorted([name for name in self.IPFOLDER.glob(f'*{ipformat}')])
+        else:
+            track_names = [f'{prj_name}_{name}{ipformat}' for name in self.namesall]
+
+        for idx, track_name in enumerate(track_names):
             if track_name not in tracknamelist:
                 print(f'import track: {track_name}')
-                importfiles(self.IPFOLDER.joinpath(f'{track_name}.wav'))
+                importfiles(self.IPFOLDER.joinpath(f'{track_name}'), compressor = compressor)
             do_command('SelectAll:')        
             do_command(f'SelectTracks: Mode="Set" Track="{idx}" TrackCount="1"')
             do_command('ZoomSel')
             do_command(f'SetTrack: Height={self.TRACK_HEIGHT}')
-            do_command(f'SetClip: At="0" Start="{self.TRACK_OFFSET}"')
+            if add_offset:
+                do_command(f'SetClip: At="0" Start="{self.TRACK_OFFSET}"')
         
         return
     
@@ -273,4 +282,28 @@ class audacitytool:
             do_command(f'Compressor: Threshold={str(-12)} NoiseFloor={str(-35)} Ratio={str(2)}')
             #do_command(f'SetClip: At="0" Start="{self.TRACK_OFFSET}"')
 
+        return
+    
+    def exportwav_seperate(self, tmp_dir, only_hostguest=False):
+        
+        print(self.config)
+        prj_name = self.PROJECTNAME
+        self.ipwavlist = {}
+        
+        trackinfos = getinfo2json()
+        tracknamelist = [trackinfo['name'] for trackinfo in trackinfos]
+        for idx, trackname in enumerate(tracknamelist):
+            if only_hostguest:
+                if not trackname in self.namesall:
+                    continue
+            do_command('SelectAll:')
+            do_command(f'SelectTracks: Mode="Set" Track="{idx}" TrackCount="1"')
+            exportpath = tmp_dir.joinpath(f'{trackname}.wav')
+            do_command(f'Export2: Filename={str(exportpath)}')
+
+        return
+    
+    def importlabel(self, label_path):
+        # do_command(f'Import2: Filename={str(label_path)}')
+        do_command('ImportLabels')
         return

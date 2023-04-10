@@ -8,7 +8,7 @@ def trackmerger(args):
     if not args.input_dir is None:
         ipdir = Path(args.input_dir)
     else:
-        ipdir = prjdir.joinpath('00_Raw_wav_cv_sil_removal')
+        ipdir = prjdir.joinpath('00_Raw_wav_prjpre_wav_silrm')
 
     if not args.output_dir is None:
         opdir = Path(args.output_dir)
@@ -65,10 +65,10 @@ def trackmerger(args):
             opfilename = opfilename + '_spatial'
     track_all.export(opdir.joinpath(opfilename).with_suffix('.wav'), format="wav")
     
-    if spatial:
-        for ipfile, track_idv in zip(ipfilelist, track_all_idv):
-            opfilename = opdir.joinpath(ipfile.name)
-            track_idv.export(opdir.joinpath(opfilename).with_suffix('.wav'), format="wav")
+    # if spatial:
+    #     for ipfile, track_idv in zip(ipfilelist, track_all_idv):
+    #         opfilename = opdir.joinpath(ipfile.name)
+    #         track_idv.export(opdir.joinpath(opfilename).with_suffix('.wav'), format="wav")
     
     return
 

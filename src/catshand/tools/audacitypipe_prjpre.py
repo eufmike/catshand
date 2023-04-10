@@ -12,6 +12,7 @@ def audacitypipe_prjpre(args):
 
     prjdir = Path(args.prj_dir)
     ipdir = args.input_dir
+    threads = args.threads
 
     if not args.input_dir is None:
         ipdir = Path(args.input_dir)
@@ -46,7 +47,7 @@ def audacitypipe_prjpre(args):
                     '--prj_dir', str(prjdir), 
                     '--input_dir', str(tmp_dir_wav), 
                     '--output_dir', str(tmp_dir_transcript),
-                    '--threads', '9',
+                    '--threads', str(threads),
                     ])
     print(args)
     
@@ -82,6 +83,7 @@ def add_subparser(subparsers):
     optional_group = subparsers.add_argument_group('Optional Arguments')
     optional_group.add_argument('-i', '--input_dir', type = str, help = 'input folders with wav files.')
     optional_group.add_argument('-o', '--output_dir', type = str, help = 'output folders for wav files.')
+    optional_group.add_argument('-t', '--threads', dest='threads', type=int, default = 1)
     subparsers.set_defaults(func=audacitypipe_prjpre)
     
     return

@@ -42,7 +42,7 @@ class postproc:
             self.ipfilelist_dict[name] = {}
             for fldname in self.folderlist:
                 self.ipfilelist_dict[name][fldname] = sorted(ip_path.joinpath(fldname).glob(f'*{name}*.wav'))
-            self.opfilelist[name] = op_path.joinpath(f'{self.prj_name}_{name}.wav')
+            self.opfilelist[name] = op_path.joinpath(f'{name}.wav')
         
         self.logger.info(f'ipfilelist_dict: {self.ipfilelist_dict}')
         self.logger.info(f'opfilelist: {self.opfilelist}')

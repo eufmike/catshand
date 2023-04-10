@@ -132,18 +132,19 @@ def remove_silence(ipaudio_dict, list_nosilence, random_silence, bitrate, thread
         
     return
 
-def mt_removesilent(args):
+def silrm(args):
 
     prjdir = Path(args.prj_dir)
     if not args.input_dir is None:
         ipdir = Path(args.input_dir)
     else:
-        ipdir = prjdir.joinpath('00_Raw_wav_cv')
+        ipdir = prjdir.joinpath('00_Raw_wav_prjpre_wav')
 
     if not args.output_dir is None:
         opdir = Path(args.output_dir)
     else:
-        opdir = prjdir.joinpath(ipdir.name + '_sil_removal')
+        opdir = prjdir.joinpath(ipdir.name + '_silrm')
+    opdir.mkdir(exist_ok=True, parents=True)
 
     logdir = prjdir.joinpath('log')
     logdir.mkdir(exist_ok=True, parents=True)
@@ -176,7 +177,7 @@ def mt_removesilent(args):
             silence = AudioSegment.silent(duration=maxlength-len(ipaudio))
             ipaudio_padded = ipaudio + silence
             ipaudio_dict[ipfile]['audio'] = ipaudio_padded
-        ipaudio_dict[ipfile]['new_length'] = len(ipaudio_padded)
+            ipaudio_dict[ipfile]['new_length'] = len(ipaudio_padded)
 
     min_silence_len=700
     silence_thresh=-60
@@ -213,8 +214,8 @@ def mt_removesilent(args):
     return
 
 def add_subparser(subparsers):
-    description = "mt_removesilent removes silence in the audio files"
-    subparsers = subparsers.add_parser('mt_removesilent', help=description)
+    description = "silrm removes silence in the audio files"
+    subparsers = subparsers.add_parser('silrm', help=description)
     required_group = subparsers.add_argument_group('Required Arguments')
     required_group.add_argument('-p', '--prj_dir', type = str, required = True, help = 'directory for the project folder')
     optional_group = subparsers.add_argument_group('Optional Arguments')
@@ -222,5 +223,5 @@ def add_subparser(subparsers):
     optional_group.add_argument('-o', '--output_dir', type = str, help = 'output folders different from default')
     optional_group.add_argument('-pz', '--pad_zero', action='store_true', help = 'pad zero to the end of audio')
     optional_group.add_argument('-t', '--threads', dest='threads', type=int, default = 1)
-    subparsers.set_defaults(func=mt_removesilent)
+    subparsers.set_defaults(func=silrm)
     return

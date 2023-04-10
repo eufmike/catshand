@@ -20,7 +20,7 @@ def importfiles(filepath, compressor = True):
     return
 
 class audacitytool:
-    def __init__(self, prj_path, ip_dir = None, hl_dir = None):
+    def __init__(self, prj_path, ip_dir = None, hl_dir = None, premerge = None):
         self.prjpath = Path(prj_path)
         # self.matpath = Path(mat_path)
         self.audtconfigpath = self.prjpath.joinpath('config', 'audt_config.json')
@@ -38,9 +38,10 @@ class audacitytool:
         self.GUESTS = config_dict.get('guests')
         self.namesall = self.HOSTS + self.GUESTS
 
-        # load audtconfig
-        with open(self.audtconfigpath, 'r') as f:
-            self.audtconfig = json.load(f)
+        # load audtconfig if the file exists
+        if self.audtconfigpath.is_file():
+            with open(self.audtconfigpath, 'r') as f:
+                self.audtconfig = json.load(f)
 
         self.TRACK_HEIGHT = self.audtconfig.get('track_height')
         self.TRACK_OFFSET = self.audtconfig.get('track_offset')
@@ -58,6 +59,9 @@ class audacitytool:
         # set path 
         if not ip_dir is None: 
             self.IPFOLDER = self.prjpath.joinpath(ip_dir)
+        if premerge is None:
+            premerge_fldname = '_'.join(self.IPFOLDER.name.split('_')[:-1])
+            self.PREMERGEFLD = self.prjpath.joinpath(premerge_fldname)
 
         if not hl_dir is None: 
             self.HIGHLIGHTFLD = self.prjpath.joinpath(hl_dir)
@@ -77,7 +81,7 @@ class audacitytool:
         if importall:
             track_names = sorted([name for name in self.IPFOLDER.glob(f'*{ipformat}')])
         else:
-            track_names = [f'{prj_name}_{name}{ipformat}' for name in self.namesall]
+            track_names = [f'{name}{ipformat}' for name in self.namesall]
 
         for idx, track_name in enumerate(track_names):
             if track_name not in tracknamelist:
@@ -153,8 +157,7 @@ class audacitytool:
         with open(self.metadatapath, 'r') as f:
             medatadict = json.load(f)
         
-        self.posteditrawpath = self.prjpath.joinpath('03_Editing_02_wav')
-        folderlist = sorted(self.posteditrawpath.iterdir())
+        folderlist = sorted(self.PREMERGEFLD.iterdir())
         self.foldernamelist = [x.name for x in folderlist]        
         
         fs = medatadict['op_fs']

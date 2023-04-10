@@ -20,14 +20,10 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
     ```
 
 5. Install dependency
-    
-    for Mac User
+   
     ```shell
-    pip install -r ./requirement_core.txt
-    ```
-    for Windows User
-    ```shell
-    pip install -r ./requirement_win.txt
+    pip install -r ./requirement_core.txt # for Mac User    
+    pip install -r ./requirement_win.txt # for Windows User
     ```
 
 6. Install ffmpeg
@@ -44,87 +40,58 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 
 8. Download test files from this [link](https://drive.google.com/drive/folders/1ZK2PGQHYUtQUZYW7GLx3O8Ukr5MvmnHe?usp=sharing)
 
-## Function
+## Audio Editing
+Catshand divides editing steps into two parts: pre-edit and post-edit. Pre-edit is the preparation process of raw audio files so they are ready for manual editing to remove filler words or undesirable phrases. Post-edit is the process of editing the finalized audio files and applying compressors and music, to make them ready for publishing.
 
-### 1. *.wav divider
+All functions of catshand are implemented in the command line. The following sections will provide an example to jumpstart the usage of catshand. Please visit the [manuals](./src/catshand/doc/manuals.md) for more details.
 
-#### Demo
-
-```shell
-catshand prjpre -i <input_dir> -o <output_dir> -c ./src/catshand/tools/split_test.csv
-```
-
-By changing the *.csv file, users can define timestamps for spliting wav files in the input directory. The timestamp format is HH:MM:SS.
-
-#### Notes
-
-1. This code is designed for single channel signed 16-bit.
-
-2. Exported rates can be different between files, while output rate will be the same as input rate.
-
-### 2. Podcast Url Parser
-# currently down
-
-```bash
-catshand linkparser
-# return
-Export:
-Apple: https://tinyurl.com/2y3yp4xs
-Google: https://tinyurl.com/2ynkqvl4
-Spotify: https://tinyurl.com/29ms2asr
-Kkbox: https://tinyurl.com/2aae45g3
-```
-
-### 3. Convert to Wav Format
-
-#### Demo
-
-1. Download test files [Link](https://drive.google.com/drive/folders/14T52ACyoYR1IxLtU7rNCz6J1y8pjzUCL?usp=sharing)
-
-2. Transfer a folder to a temporary directory
-
-3. Run the following command
-
+### Pre-edit
+1. (Optional) Download audio materials from Google Drive: [link](https://drive.google.com/drive/folders/1vwkKg64AObKdqqiLxe1SyYdqx3ysGs3P?usp=share_link). This step is optional if you are using catshand only for pre-editing. Move the folder to the root directory of catshand.
+2. Create a project folder in the root directory of catshand using the following command:
     ```shell
-    catshand prjpost -i <input_dir>
+    catshand prjinit -d <root_dir> -n <project_name> -m <material_dir>
+    # example
+    atshand prjinit -d /path/to/project/Podcast/ -n EP099 -m /path/to/project/Podcast/material
+    ```
+    Answer the questions in the terminal. The project folder will be created in the root directory of catshand. The project folder will contain the following files:
+3. Download audio files from Google Drive to the project folder. The folder name should be "00_Raw"
+4. Run the following commands in order: 
+    ```shell
+    # conver m4a to wav with filename matching
+    catshand audio2wav -p /path/to/project/Podcast/EP099 -m
+
+    # launch audacity for manual audio alignment, editing and find splitting timepoint
+    # transcript can be generated and load as labels
+    # Answer the questions in the terminal
+    catshand audacitypipe_prjpre -p /path/to/project/Podcast/EP099/ -t 4
+
+    # perform loudness normalization and noise reduction
+    catshand audio2wav -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/00_Raw_wav_prjpre -lr -t 4
+    # remove silence
+    catshand silrm -p /path/to/project/Podcast/EP099/ -pz -t 4
+    # split audio files
+    catshand audiosplit -p /path/to/project/Podcast/EP099/ -ts 00:02:00 00:04:00 # split audio files
+    ```
+5. To split the file after track merging, you can run the following commands:
+    ```shell
+    # merge audio files into one track 
+    # convert to stereo and spatial audio features
+    # mergered audio exported to "merged" folder
+    catshand trackmerger -p /path/to/project/Podcast/EP099/ -s -sp
+    
+    # split audio files
+    catshand audiosplit -p /path/to/project/Podcast/EP099/ -i /path/to/project/Podcast/EP099/merged -ts 00:02:00 00:04:00 
     ```
 
-4. Options
-
-- `-i`: define input dir
-
-- `-e`: define output dir; default = None
-
-- `-tfs`: target sampling rate; default = 32000
-
-## Processing Steps
-
-- Download finalized edited audio from Google Drive
-- Rename all session to 01, 02, 03...
-- Rename all fileanmes by hosts' and guests' name. Ensure the naming fashion is the same as config.json
-
-- run prjpost on postedit wavs
-
+### Post-edit
+1. Run the following command for post-editing. Make sure the material folder is downloaded and placed in the dedicated folder.
     ```shell
-    catshand prjpost -i C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_raw
+    # convert wav and perform the loudness normalization
+    catshand audio2wav -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02 -l -t 4
+    # merge audio files from each sessions to a signle track
+    catshand audmerger -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav -t 4
+    # convert highlight audio to wav with loudness normalization
+    catshand audio2wav -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/05_Highlight -l
+    # Load to Audacity
+    catshand audacitypipe -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav_merged
     ```
-
-- run wav files merger audmerger.py
-
-    ```shell
-    catshand audmerger -i 'C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_raw_export\' -o 'C:\Users\michaelshih\Documents\Podcast_tmp\EP024\postedit_merged\' -cfg C:\Users\michaelshih\Documents\Podcast_tmp\EP024\config\config.json
-    ```
-
-- Download hightlight from Google Drive, current only support wav
-- Rename the filename to `highlight.wav`
-- run postedit on the hightlight
-
-    ```shell
-    catshand prjpost -i C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight -o C:\Users\michaelshih\Documents\Podcast_tmp\EP024\highlight_export --ext 'wav'
-    ```
-
-- run Audacity macro tool audacitypipe
-
-    ```shell
-    catshand audacitypipe -i C:\Users\michaelshih\Documents\Podcast_tmp\EP025 -m Z:\sc2.shih\Drive\Podcast\Edit\material
-    ``` 

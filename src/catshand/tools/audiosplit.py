@@ -9,7 +9,7 @@ def audiosplit(args):
     if not args.input_dir is None:
         ipdir = Path(args.input_dir)
     else:
-        ipdir = prjdir.joinpath('00_Raw_prjpre')
+        ipdir = prjdir.joinpath('00_Raw_wav_prjpre_wav_silrm')
 
     if not args.output_dir is None:
         opdir = Path(args.output_dir)

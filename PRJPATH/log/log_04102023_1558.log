@@ -1,0 +1,4 @@
+INFO:root:2023-04-10 15:58:57,735:args: Namespace(prj_dir='PRJPATH', input_dir=None, output_dir=None, timestamps=['00:02:00', '00:04:00'], input_format='.wav', func=<function audiosplit at 0x7f99d2aac280>)
+INFO:root:2023-04-10 15:58:57,735:Timestamps: ['00:00:00', '00:02:00', '00:04:00']
+INFO:root:2023-04-10 15:58:57,735:Start spliting files...
+INFO:root:2023-04-10 15:58:57,735:Done

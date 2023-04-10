@@ -51,8 +51,8 @@ class postproc:
 
     def createmetadata(self):
         if self.metadata_path.is_file():
-                with open(self.metadata_path, 'r') as f:
-                    mainmetadata_dict = json.load(f)
+            with open(self.metadata_path, 'r') as f:
+                mainmetadata_dict = json.load(f)
         else: 
             self.metadata_dict = {}
             for section in self.folderlist:

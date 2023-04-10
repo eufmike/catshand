@@ -29,7 +29,7 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
 6. Install ffmpeg
     
     ```shell
-    conda install -c conda-forge ffmpeg
+    conda install -c conda-forge ffmpeg -y
     ```
 
 7. Installation
@@ -39,6 +39,18 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
     ```
 
 8. Download test files from this [link](https://drive.google.com/drive/folders/1ZK2PGQHYUtQUZYW7GLx3O8Ukr5MvmnHe?usp=sharing)
+
+9. Add OpenAI API key to the environment variable to use the transcript generation function and transcript summary. Please visit [OpenAI](https://openai.com/) to get the API key and [Best Practices for API Key Safety](https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety) for more details.
+
+    ```shell
+
+    # Windows (in cmd prompt)
+    setx OPENAI_API_KEY “<yourkey>”
+    
+    # Mac
+    echo "export OPENAI_API_KEY='yourkey'" >> ~/.zshrc
+    ```
+
 
 ## Audio Editing
 Catshand divides editing steps into two parts: pre-edit and post-edit. Pre-edit is the preparation process of raw audio files so they are ready for manual editing to remove filler words or undesirable phrases. Post-edit is the process of editing the finalized audio files and applying compressors and music, to make them ready for publishing.

@@ -21,8 +21,8 @@ def audacitypipe(args):
     audtl.importrecording()
     audtl.importmaterial()
     audtl.importhighlight()
+    print("add music")
     audtl.addmusic(default_music = "Middle_01.wav")
-    #audtl.midedit()
     return
 
 def add_subparser(subparsers):

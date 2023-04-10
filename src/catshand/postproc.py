@@ -49,8 +49,8 @@ class postproc:
         self.logger.info(f'folderlist: {self.folderlist}')
         return
 
-    def createmetadata(self):
-        if self.metadata_path.is_file():
+    def createmetadata(self, check_file_exist=True):
+        if self.metadata_path.is_file() and check_file_exist:
             with open(self.metadata_path, 'r') as f:
                 mainmetadata_dict = json.load(f)
         else: 

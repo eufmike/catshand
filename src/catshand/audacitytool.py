@@ -154,6 +154,7 @@ class audacitytool:
     # ===================================================================
     
     def _metadata2sectionlength(self, default_music = 'Middle_01.wav'):
+        print('add music')
         with open(self.metadatapath, 'r') as f:
             medatadict = json.load(f)
         
@@ -250,7 +251,6 @@ class audacitytool:
     def addmusic(self, default_music):
         self.metadatapath = self.prjpath.joinpath('config', 'metadata.json')
         self.musiccsvpath = self.prjpath.joinpath('config', 'addmusic.csv')
-        
         if self.musiccsvpath.is_file():
             self.dfaddmusic = pd.read_csv(self.musiccsvpath)
         else:

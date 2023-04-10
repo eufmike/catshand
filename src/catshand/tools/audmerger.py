@@ -31,7 +31,7 @@ def audmerger(args):
     logger.info('Merge wav files...')
     postproc_obj = postproc(prjconfig_path) 
     postproc_obj.filedict_gen(ipdir, opdir)
-    postproc_obj.createmetadata()
+    postproc_obj.createmetadata(check_file_exist=False)
     postproc_obj.wav2mergemono(target_fs = 32000, loudness = loudness, threads = threads)
     logger.info('Done merging...')
 

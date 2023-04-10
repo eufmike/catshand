@@ -40,7 +40,7 @@ def audmerger(args):
 def add_subparser(subparsers):
     description = "audmerger merges audio files"
     subparsers = subparsers.add_parser('audmerger', help=description)
-    required_group = subparsers.add_argument_group('Required Arguments')
+    required_group = subparsers.add_argument_group('Required Arguments') 
     required_group.add_argument('-p', '--prj_dir', type = str, required = True, help = 'directory for the project folder')
     optional_group = subparsers.add_argument_group('Optional Arguments')
     optional_group.add_argument('-i', '--input_dir', type = str, help = 'input folders with wav files to be merged.')

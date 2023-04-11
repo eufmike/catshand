@@ -66,6 +66,10 @@ def audacitypipe_prjpre(args):
                 f.write(sentence)
                 f.write('\n')
         audtl.importlabel(txt_path)
+    else: 
+        if click.confirm('Would you like to open existing transcripts? ', default=True):
+            txt_path = tmp_dir_transcript.joinpath('doc', 'aud_labels.txt')
+            audtl.importlabel(txt_path)
     
     opdir.mkdir(parents=True, exist_ok=True)
     if click.confirm(f'Export wav files to {opdir}', default=True):

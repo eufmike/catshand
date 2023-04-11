@@ -1,6 +1,8 @@
-# Cat's Hand (catshand)
+# Catshand (Cat's Hand)
 
-Cat's Hand is a toolbox designed for audio editing and production in the team of Tripod Cat's Podcast. Cat's Hand (catshand) is named after the Japanese idiom "猫の手も借りたい", which means "so busy someone wants to borrow even the paw of a cat."
+Catshand (Cat's Hand) is a toolbox designed for audio editing and production in the team of Tripod Cat's Podcast. Catshand is named after the Japanese idiom "猫の手も借りたい", which means "so busy someone wants to borrow even the paw of a cat." It simplifies the audio editing process by automating repetitive tasks and integrating with the popular editing tool Audacity. Catshand provides OpenAI-powered transcription and content summary, so users can focus on the creative process, rather than spending time on content searching.  
+
+![catshand_with_Audacity](./src/catshand/fig/screen_02.png)
 
 ## Installation
 
@@ -38,7 +40,7 @@ Cat's Hand is a toolbox designed for audio editing and production in the team of
     pip install -e .
     ```
 
-8. Download test files from this [link](https://drive.google.com/drive/folders/1ZK2PGQHYUtQUZYW7GLx3O8Ukr5MvmnHe?usp=sharing)
+8. Download demo files from this [link](https://drive.google.com/drive/folders/18VaKpXfOgM0KQbxOm8sdr8dGdOJpBT3t?usp=share_link)
 
 9. Add OpenAI API key to the environment variable to use the transcript generation function and transcript summary. Please visit [OpenAI](https://openai.com/) to get the API key and [Best Practices for API Key Safety](https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety) for more details.
 

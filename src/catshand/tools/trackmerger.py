@@ -3,6 +3,12 @@ from catshand.utility import loggergen
 import numpy as np
 from pydub import AudioSegment
 
+
+def volume_spatial(amount_audio, size = 3):
+    adjust_volume = np.linspace(-1, 1, amount_audio)
+    adjust_volume = adjust_volume * size
+    return adjust_volume
+
 def trackmerger(args):
     prjdir = Path(args.prj_dir)
     if not args.input_dir is None:
@@ -28,43 +34,47 @@ def trackmerger(args):
     ipfilelist = sorted(Path(ipdir).glob(str(Path('**').joinpath(f'*.wav'))))
     logger.info(f'ipfilelist: {ipfilelist}')
 
-    def volume_spatial(amount_audio, size = 3):
-        adjust_volume = np.linspace(-1, 1, amount_audio)
-        adjust_volume = adjust_volume * size
-        return adjust_volume
-    
-    amount_audio = len(ipfilelist)
-    left_adjust_volume = list(volume_spatial(amount_audio, size = 1))
-    right_adjust_volume = list(-volume_spatial(amount_audio, size = 1))
-    print(left_adjust_volume)
-    print(right_adjust_volume)
+    parent_ipdirs = list(set([x.parent for x in ipfilelist]))
+    parent_ipdirs = sorted(parent_ipdirs)
+    parent_oppaths = [opdir.joinpath(f'{x.name}_merged.wav') for x in parent_ipdirs]
 
-    track = AudioSegment.from_wav(ipfilelist[0])
-    audio_len = len(track)
-    logger.info(f'audio_len: {audio_len}')
-    track_all = AudioSegment.silent(duration=audio_len)
+    for parent_ipdir, parent_oppath in zip(parent_ipdirs, parent_oppaths):
+        print(parent_ipdir)
+        print(parent_oppath)
+        child_ipfilelist = sorted(Path(parent_ipdir).glob(str(Path('**').joinpath(f'*.wav'))))
 
-    if stereo:
-        track_all = track_all.set_channels(2) 
+        amount_audio = len(child_ipfilelist)
+        left_adjust_volume = list(volume_spatial(amount_audio, size = 1))
+        right_adjust_volume = list(-volume_spatial(amount_audio, size = 1))
+        print(left_adjust_volume)
+        print(right_adjust_volume)
 
-    track_all_idv = []
-    for idx, ipfile in enumerate(ipfilelist): 
-        track_tmp = AudioSegment.from_wav(ipfile)
+        track = AudioSegment.from_wav(child_ipfilelist[0])
+        audio_len = len(track)
+        logger.info(f'audio_len: {audio_len}')
+        track_all = AudioSegment.silent(duration=audio_len)
+
         if stereo:
-            track_tmp = track_tmp.set_channels(2)
+            track_all = track_all.set_channels(2) 
+
+        track_all_idv = []
+        for idx, ipfile in enumerate(child_ipfilelist): 
+            track_tmp = AudioSegment.from_wav(ipfile)
+            if stereo:
+                track_tmp = track_tmp.set_channels(2)
+                if spatial:
+                    print(left_adjust_volume[idx], right_adjust_volume[idx])
+                    track_tmp = track_tmp.apply_gain_stereo(left_adjust_volume[idx], right_adjust_volume[idx])
+            track_all_idv.append(track_tmp)
+            track_all = track_all.overlay(track_tmp)
+            
+        opfilename = 'track_all'
+        if stereo:
+            opfilename = opfilename + '_stereo'
             if spatial:
-                print(left_adjust_volume[idx], right_adjust_volume[idx])
-                track_tmp = track_tmp.apply_gain_stereo(left_adjust_volume[idx], right_adjust_volume[idx])
-        track_all_idv.append(track_tmp)
-        track_all = track_all.overlay(track_tmp)
+                opfilename = opfilename + '_spatial'
+        track_all.export(parent_oppath, format="wav")
         
-    opfilename = 'track_all'
-    if stereo:
-        opfilename = opfilename + '_stereo'
-        if spatial:
-            opfilename = opfilename + '_spatial'
-    track_all.export(opdir.joinpath(opfilename).with_suffix('.wav'), format="wav")
-    
     # if spatial:
     #     for ipfile, track_idv in zip(ipfilelist, track_all_idv):
     #         opfilename = opdir.joinpath(ipfile.name)

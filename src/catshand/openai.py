@@ -91,7 +91,7 @@ def _speech_to_text(idx, audio_section, opsegdir):
         try:
             #initial_prompt = "Transcribe this audio to tranditional Chinese and English. pause fillers/filled pauses and particles should be in Chinese."
             # initial_prompt = "本音檔是一個討論生物醫學研究、在美生活、求學生涯以及心理健康的對話。將本音檔產生繁體中# 文的逐字稿，音檔中的贅詞、填詞和語助詞應該用繁體中文表示。只有關鍵詞、人名以及專有名詞用英文表示。逐字稿不應# 該包含英文、繁體中文以外的字。少於兩秒的音檔只產生繁體中文。Hmm替代為嗯。"
-            initial_prompt = "This audio discusses biomedical research, experience in living abroad, and mental health. Please cerate a transcript of this audio mainly in traditional Chinese, only transcribe names, professional terms in both Traditional Chinese and English. Particals and filled pauses should be transcribed in Traditional Chinsese. For example, Hmm should be replaced by 嗯."
+            initial_prompt = "This audio discusses biomedical research, experience in living abroad, and mental health. Please cerate a transcript of this audio mainly in traditional Chinese, only transcribe names, professional terms in both Traditional Chinese and English. Particals and filled pauses should be transcribed in Traditional Chinese. For example, Hmm should be replaced by 嗯."
             response = openai.Audio.transcribe("whisper-1", f, initial_prompt=initial_prompt)
             text = response['text']
             print(text)

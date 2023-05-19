@@ -105,13 +105,20 @@ All functions of catshand are implemented in the command line. The following sec
     # convert wav and perform the loudness normalization
     catshand audio2wav -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02 -l -t 4
     
-    # merge audio files from each sessions to a signle track
+    # merge audio files from each sessions to a single track
+    # multi-track
     catshand audmerger -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav -t 4
-    
+    # single-track
+    catshand audmerger -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav -t 4 -s
+
     # convert highlight audio to wav with loudness normalization
     catshand audio2wav -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/05_Highlight -l
     
     # Load to Audacity
+    # multi-track
     catshand audacitypipe -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav_merged
+    # single-track
+    catshand audacitypipe -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav_merged -s
+    # add --skip_highlight to skip adding highlight in preparation
     ```
 

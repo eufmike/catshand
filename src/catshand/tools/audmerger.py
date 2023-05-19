@@ -30,9 +30,9 @@ def audmerger(args):
     
     logger.info('Merge wav files...')
     postproc_obj = postproc(prjconfig_path) 
-    postproc_obj.filedict_gen(ipdir, opdir)
-    postproc_obj.createmetadata(check_file_exist=False)
-    postproc_obj.wav2mergemono(target_fs = 32000, loudness = loudness, threads = threads)
+    postproc_obj.filedict_gen(ipdir, opdir, single_track = args.single_track)
+    postproc_obj.createmetadata(check_file_exist=False, single_track = args.single_track)
+    postproc_obj.wav2mergemono(target_fs = 32000, loudness = loudness, threads = threads, single_track = args.single_track)
     logger.info('Done merging...')
 
     return
@@ -46,6 +46,7 @@ def add_subparser(subparsers):
     optional_group.add_argument('-i', '--input_dir', type = str, help = 'input folders with wav files to be merged.')
     optional_group.add_argument('-o', '--output_dir', type = str, help = 'output folders for merged wav files.')
     optional_group.add_argument('-l', '--loudness', action='store_true', help = 'apply loudness adjustment')
+    optional_group.add_argument('-s', '--single_track', action='store_true', help = 'single track mode for track-merged wav files')
     optional_group.add_argument('-t', '--threads', dest='threads', type=int, default = 1)
     # subparsers.add_argument('-cfg', '--prjconfig_path', help = 'the project config')
     subparsers.set_defaults(func=audmerger)

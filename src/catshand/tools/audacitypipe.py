@@ -17,16 +17,17 @@ def audacitypipe(args):
     else:
         hl_dir = prjdir.joinpath('05_Highlight_wav')
 
-    audtl = audacitytool(prjdir, ipdir, hl_dir)
-    audtl.importrecording()
+    audtl = audacitytool(prjdir, ipdir, hl_dir, skip_highlight=args.skip_highlight)
+    audtl.importrecording(single_track = args.single_track)
     audtl.importmaterial()
-    audtl.importhighlight()
+    if not args.skip_highlight:
+        audtl.importhighlight()
     print("add music")
     audtl.addmusic(default_music = "Middle_01.wav")
     return
 
 def add_subparser(subparsers):
-    description = 'Auddacity_tool controls Audacity via macro PIPE.'
+    description = 'Audacity_tool controls Audacity via macro PIPE.'
     # parser = argparse.ArgumentParser(description=description)
     subparsers = subparsers.add_parser('audacitypipe', help=description)
     required_group = subparsers.add_argument_group('Required Arguments')
@@ -35,6 +36,8 @@ def add_subparser(subparsers):
     optional_group = subparsers.add_argument_group('Optional Arguments')
     optional_group.add_argument('-i', '--input_dir', type = str, help = 'input folders with wav files.')
     optional_group.add_argument('-hl', '--highlight_dir', type = str, help = 'input folders with wav files.')
+    optional_group.add_argument('-s', '--single_track', action='store_true', help = 'single track mode for track-merged wav files')
+    optional_group.add_argument('--skip_highlight', action='store_true', help = 'skip highlight when highlight is in preparation')
     subparsers.set_defaults(func=audacitypipe)
     
     return

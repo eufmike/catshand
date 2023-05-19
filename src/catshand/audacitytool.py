@@ -20,7 +20,7 @@ def importfiles(filepath, compressor = True):
     return
 
 class audacitytool:
-    def __init__(self, prj_path, ip_dir = None, hl_dir = None, premerge = None):
+    def __init__(self, prj_path, ip_dir = None, hl_dir = None, premerge = None, skip_highlight = None):
         self.prjpath = Path(prj_path)
         # self.matpath = Path(mat_path)
         self.audtconfigpath = self.prjpath.joinpath('config', 'audt_config.json')
@@ -63,22 +63,24 @@ class audacitytool:
             premerge_fldname = '_'.join(self.IPFOLDER.name.split('_')[:-1])
             self.PREMERGEFLD = self.prjpath.joinpath(premerge_fldname)
 
-        if not hl_dir is None: 
+        if (not hl_dir is None) and (skip_highlight is None): 
             self.HIGHLIGHTFLD = self.prjpath.joinpath(hl_dir)
             self.HIGHLIGHTPATH = sorted(self.HIGHLIGHTFLD.glob(f'*.wav'))[0]
 
         return
         
     def importrecording(self, importall = False, ipformat = '.wav', 
-                        add_offset = True, compressor = True):
+                        add_offset = True, compressor = True, single_track = None):
         print(self.config)
         prj_name = self.PROJECTNAME
         self.ipwavlist = {}
         
         trackinfos = getinfo2json()
         tracknamelist = [trackinfo['name'] for trackinfo in trackinfos]
-        
-        if importall:
+
+        if single_track:
+            track_names = [f'{prj_name}{ipformat}']
+        elif importall:
             track_names = sorted([name for name in self.IPFOLDER.glob(f'*{ipformat}')])
         else:
             track_names = [f'{name}{ipformat}' for name in self.namesall]

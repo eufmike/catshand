@@ -28,40 +28,64 @@ class postproc:
         self.metadata_path = config_fld.joinpath('metadata.json')
         return
     
-    def filedict_gen(self, ip_path, op_path):
+    def filedict_gen(self, ip_path, op_path, single_track = None):
         self.ip_path = ip_path
         self.op_path = op_path
         self.prj_name = self.prjconfig['project_name']
-        self.namelistorder = self.prjconfig['hosts'] + self.prjconfig['guests']
-    
-        self.folderlist = [x.name for x in sorted(ip_path.iterdir())]
+
+        if not single_track:
+            self.namelistorder = self.prjconfig['hosts'] + self.prjconfig['guests']
+            self.folderlist = [x.name for x in sorted(ip_path.iterdir())]
+        else:
+            self.namelistorder = [self.prj_name]
+            self.folderlist = ['xxxx']
+
         self.ipfilelist_dict = {}
         self.opfilelist = {}
         
-        for name in self.namelistorder:
-            self.ipfilelist_dict[name] = {}
-            for fldname in self.folderlist:
-                self.ipfilelist_dict[name][fldname] = sorted(ip_path.joinpath(fldname).glob(f'*{name}*.wav'))
-            self.opfilelist[name] = op_path.joinpath(f'{name}.wav')
+        if not single_track:
+            for name in self.namelistorder:
+                self.ipfilelist_dict[name] = {}
+                for fldname in self.folderlist:
+                    self.ipfilelist_dict[name][fldname] = sorted(ip_path.joinpath(fldname).glob(f'*{name}*.wav'))
+                self.opfilelist[name] = op_path.joinpath(f'{name}.wav')
+            self.logger.info(f'ipfilelist_dict: {self.ipfilelist_dict}')
+            self.logger.info(f'opfilelist: {self.opfilelist}')
+            self.logger.info(f'folderlist: {self.folderlist}')
         
-        self.logger.info(f'ipfilelist_dict: {self.ipfilelist_dict}')
-        self.logger.info(f'opfilelist: {self.opfilelist}')
-        self.logger.info(f'folderlist: {self.folderlist}')
+        else: 
+            self.ipfilelist_dict[self.prj_name] = {}
+            self.ipfilelist_dict[self.prj_name] = sorted(ip_path.glob(f'*.wav'))
+            self.opfilelist[self.prj_name] = op_path.joinpath(f'{self.prj_name}.wav')
+
+            self.logger.info(f'ipfilelist_dict: {self.ipfilelist_dict}')
+            self.logger.info(f'opfilelist: {self.opfilelist}')
+        
         return
 
-    def createmetadata(self, check_file_exist=True):
+    def createmetadata(self, check_file_exist=True, single_track = None):
         if self.metadata_path.is_file() and check_file_exist:
             with open(self.metadata_path, 'r') as f:
                 mainmetadata_dict = json.load(f)
         else: 
             self.metadata_dict = {}
-            for section in self.folderlist:
-                self.metadata_dict[section] = {}
-                wavfilelist = [self.ipfilelist_dict[x][section][0] for x in self.namelistorder]
-                
+
+            if not single_track:
+                for section in self.folderlist:
+                    self.metadata_dict[section] = {}
+                    wavfilelist = [self.ipfilelist_dict[x][section][0] for x in self.namelistorder]
+                    
+                    for wavfile in wavfilelist:
+                        fs, data = read(wavfile)
+                        self.metadata_dict[section][wavfile.name] = {'fs': fs, 
+                                                        'shape': data.shape,
+                                                        }
+            else:
+                self.metadata_dict[self.prj_name] = {}
+                wavfilelist = self.ipfilelist_dict[self.prj_name]
                 for wavfile in wavfilelist:
                     fs, data = read(wavfile)
-                    self.metadata_dict[section][wavfile.name] = {'fs': fs, 
+                    self.metadata_dict[self.prj_name][wavfile.name] = {'fs': fs, 
                                                     'shape': data.shape,
                                                     }
             mainmetadata_dict = {}
@@ -88,30 +112,42 @@ class postproc:
         change_in_dBFS = target_dBFS - sound_nosilence.dBFS
         return sound.apply_gain(change_in_dBFS)
 
-    def _wav2mergemono(self, name, target_fs, loudness):
+    def _wav2mergemono(self, name, target_fs, loudness, single_track):
         self.logger.info(name)
         if not self.opfilelist[name].is_file():
-
+            print('ssss')
+            print(self.opfilelist[name])
+            # print('folderlist:'+ self.folderlist)
             sound_combined = AudioSegment.empty()
-            for section in self.folderlist:
-                wavfile = self.ipfilelist_dict[name][section][0]
-                self.logger.info(str(wavfile))
-                
-                # fs, data = read(str(wavfile))
-                sound = AudioSegment.from_file(str(wavfile))
-                sound = sound.set_channels(1)
-                sound = sound.set_frame_rate(target_fs)           
-                max_length_second = float(self.mainmetadata_dict['maxlength'][section])
-                
-                max_length_ms = max_length_second * 1000
-                if max_length_ms >= len(sound):
-                    silence = AudioSegment.silent(duration=max_length_ms-len(sound))
-                    sound = sound + silence
-                else:
-                    sound = sound[:max_length_ms]
 
-                
-                sound_combined = sound_combined + sound
+            if not single_track:
+                for section in self.folderlist:
+                    wavfile = self.ipfilelist_dict[name][section][0]
+                    self.logger.info(str(wavfile))
+                    
+                    # fs, data = read(str(wavfile))
+                    sound = AudioSegment.from_file(str(wavfile))
+                    sound = sound.set_channels(1)
+                    sound = sound.set_frame_rate(target_fs)           
+                    max_length_second = float(self.mainmetadata_dict['maxlength'][section])
+                    
+                    max_length_ms = max_length_second * 1000
+                    if max_length_ms >= len(sound):
+                        silence = AudioSegment.silent(duration=max_length_ms-len(sound))
+                        sound = sound + silence
+                    else:
+                        sound = sound[:max_length_ms]
+
+                    sound_combined = sound_combined + sound
+            else:
+                for wavfile in self.ipfilelist_dict[name]:
+                    self.logger.info(str(wavfile))
+                    
+                    # fs, data = read(str(wavfile))
+                    sound = AudioSegment.from_file(str(wavfile))
+                    sound = sound.set_channels(1)
+                    sound = sound.set_frame_rate(target_fs)           
+                    sound_combined = sound_combined + sound
 
             if loudness: 
                 sound_combined_downsample = sound_combined.set_frame_rate(600)
@@ -124,7 +160,7 @@ class postproc:
         self.logger.info(f'mainmetadata_dict: {self.mainmetadata_dict}')
         return
 
-    def _mp_wav2mergemono(self, target_fs, loudness, threads):
+    def _mp_wav2mergemono(self, target_fs, loudness, threads, single_track):
 
         if threads > 1:
             pbar = tqdm(total=len(self.namelistorder))
@@ -136,28 +172,37 @@ class postproc:
             pool = mp.Pool(threads)
             # sections = []
             for name in self.namelistorder:
-                pool.apply_async(self._wav2mergemono, args=(name, target_fs, loudness), callback=pbar_update)
+                pool.apply_async(self._wav2mergemono, args=(name, target_fs, loudness, single_track), callback=pbar_update)
             pool.close()
             pool.join()
 
         else:
             for name in tqdm(self.namelistorder):
-                self._wav2mergemono(name, target_fs, loudness)
+                self._wav2mergemono(name, target_fs, loudness, single_track)
             
         return
 
-    def wav2mergemono(self, target_fs = 32000, loudness = False, threads = 1):
+    def wav2mergemono(self, target_fs = 32000, loudness = False, threads = 1, single_track = None):
         with open(self.metadata_path, 'r') as f:
             self.mainmetadata_dict = json.load(f)
 
         maxlength_dict = {}
-        for section in self.folderlist:    
+
+        if not single_track:
+            for section in self.folderlist:    
+                audiolength = []
+                for wavfile, value in self.mainmetadata_dict['postedit'][section].items():
+                    audiolength.append(value['shape'][0] / value['fs'])
+
+                max_audiolength = np.amax(audiolength)
+                maxlength_dict[section] = str(max_audiolength)
+        else:
             audiolength = []
-            for wavfile, value in self.mainmetadata_dict['postedit'][section].items():
+            for wavfile, value in self.mainmetadata_dict['postedit'][self.prj_name].items():
                 audiolength.append(value['shape'][0] / value['fs'])
 
-            max_audiolength = np.amax(audiolength)
-            maxlength_dict[section] = str(max_audiolength)
+                max_audiolength = np.amax(audiolength)
+                maxlength_dict[wavfile] = str(max_audiolength)
         
         self.logger.info(maxlength_dict)
         
@@ -169,7 +214,7 @@ class postproc:
             json.dump(self.mainmetadata_dict, f, indent=2, sort_keys=True)
             f.truncate()      
         
-        self._mp_wav2mergemono(target_fs, loudness = loudness, threads=threads)
+        self._mp_wav2mergemono(target_fs, loudness = loudness, threads=threads, single_track = single_track)
         
         return
 

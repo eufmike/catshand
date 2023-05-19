@@ -71,7 +71,7 @@ All functions of catshand are implemented in the command line. The following sec
 3. Download audio files from Google Drive to the project folder. The folder name should be "00_Raw"
 4. Run the following commands in order: 
     ```shell
-    # conver m4a to wav with filename matching
+    # convert m4a to wav with filename matching
     catshand audio2wav -p /path/to/project/Podcast/EP099 -m
 
     # launch audacity for manual audio alignment, editing and find splitting timepoint

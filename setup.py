@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     
 setuptools.setup(
     name='catshand',
-    version='0.3.0',
+    version='0.3.1',
     author='Mike Chien-Cheng Shih',
     author_email='m.cc.shih@gmail.com',
     description='Tools for Podcast editing',

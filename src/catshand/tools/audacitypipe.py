@@ -17,13 +17,21 @@ def audacitypipe(args):
     else:
         hl_dir = prjdir.joinpath('05_Highlight_wav')
 
-    audtl = audacitytool(prjdir, ipdir, hl_dir, skip_highlight=args.skip_highlight)
-    audtl.importrecording(single_track = args.single_track)
-    audtl.importmaterial()
-    if not args.skip_highlight:
+    audtl = audacitytool(prjdir, ipdir, hl_dir)
+
+    if (args.commands is None) or ('importrecording' in args.commands):
+        print("import recordings")
+        audtl.importrecording(single_track = args.single_track)
+    if (args.commands is None) or ('importmaterial' in args.commands):
+        print("import materials")
+        audtl.importmaterial()
+    if (args.commands is None) or ('importhighlight' in args.commands):  
+        print("import the hightlight")
         audtl.importhighlight()
-    print("add music")
-    audtl.addmusic(default_music = "Middle_01.wav")
+    if (args.commands is None) or ('addmusic' in args.commands):
+        print("add music")
+        audtl.addmusic(default_music = "Middle_01.wav")
+    
     return
 
 def add_subparser(subparsers):
@@ -36,8 +44,9 @@ def add_subparser(subparsers):
     optional_group = subparsers.add_argument_group('Optional Arguments')
     optional_group.add_argument('-i', '--input_dir', type = str, help = 'input folders with wav files.')
     optional_group.add_argument('-hl', '--highlight_dir', type = str, help = 'input folders with wav files.')
+    optional_group.add_argument('-c', '--commands', type = str, nargs = '+', help = 'individual commands. Options: importrecording, importmaterial, importhighlight, addmusic')
     optional_group.add_argument('-s', '--single_track', action='store_true', help = 'single track mode for track-merged wav files')
-    optional_group.add_argument('--skip_highlight', action='store_true', help = 'skip highlight when highlight is in preparation')
+    # optional_group.add_argument('--skip_highlight', action='store_true', help = 'skip highlight when highlight is in preparation')
     subparsers.set_defaults(func=audacitypipe)
     
     return

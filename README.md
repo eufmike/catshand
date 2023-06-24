@@ -99,6 +99,10 @@ All functions of catshand are implemented in the command line. The following sec
     catshand audiosplit -p /path/to/project/Podcast/EP099/ -i /path/to/project/Podcast/EP099/merged -ts 00:02:00 00:04:00 
     ```
 
+### Pre-edit after file splitting (for editing services)
+1. # perform loudness normalization and noise reduction
+    catshand audio2wav -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/00_Raw_wav_prjpre -lr -t 4
+
 ### Post-edit
 1. Run the following command for post-editing. Make sure the material folder is downloaded and placed in the dedicated folder.
     ```shell
@@ -122,3 +126,35 @@ All functions of catshand are implemented in the command line. The following sec
     # add --skip_highlight to skip adding highlight in preparation
     ```
 
+## with editing service
+### Pre editing
+1. Initiate the project folder
+    ```shell
+    catshand prjinit -d /path/to/project/Podcast/ -n EP099 -m /path/to/project/Podcast/material
+    ```
+2. Convert the audio file to wav (even the original file is wav)
+    ```shell
+    catshand audio2wav -p /path/to/project/Podcast/EP099/ -i /path/to/project/Podcast/EP099/02_To_merge -lr -t 4
+    ```
+3. Merge each session (multiple tracks) into one track
+    ```shell
+    catshand trackmerger -p /path/to/project/Podcast/EP099/  -i /path/to/project/Podcast/EP099/02_To_merge_wav_manual -s -v 0 0 4
+    ```
+
+### Post editing
+1. Convert the audio file to wav (even the original file is wav)
+    ```shell
+    catshand audio2wav -p /path/to/project/Podcast/EP099/ -i /path/to/project/Podcast/EP099/03_Editing_02 -l -t 4 
+    ```
+2. Create audio metadata using the audio merger
+    ```shell
+    catshand audmerger -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav -t 4 -s
+    ```
+3. Load into Audacity
+    ```shell
+    catshand audacitypipe -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav_merged -s -c importrecording importmaterial addmusic
+    ```
+4. Create transcriptions
+    ```shell
+    catshand prjsummary -p /path/to/project/Podcast/EP099/ -i /path/to/project/Podcast/EP099/09_export_tran -o /path/to/project/Podcast/EP099/09_export_tran -t 4
+    ```

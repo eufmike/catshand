@@ -77,15 +77,20 @@ class postproc:
                     
                     for wavfile in wavfilelist:
                         fs, data = read(wavfile)
-                        self.metadata_dict[section][wavfile.name] = {'fs': fs, 
+                        self.metadata_dict[section][wavfile.name] = {
+                                                        'fs': fs, 
                                                         'shape': data.shape,
                                                         }
             else:
                 self.metadata_dict[self.prj_name] = {}
                 wavfilelist = self.ipfilelist_dict[self.prj_name]
+                print(wavfilelist)
                 for wavfile in wavfilelist:
+                    print(wavfile)
                     fs, data = read(wavfile)
-                    self.metadata_dict[self.prj_name][wavfile.name] = {'fs': fs, 
+                    print(data.shape)
+                    self.metadata_dict[self.prj_name][wavfile.name] = {
+                                                    'fs': fs, 
                                                     'shape': data.shape,
                                                     }
             mainmetadata_dict = {}
@@ -191,18 +196,16 @@ class postproc:
         if not single_track:
             for section in self.folderlist:    
                 audiolength = []
-                for wavfile, value in self.mainmetadata_dict['postedit'][section].items():
+                for wavfile, value in sorted(self.mainmetadata_dict['postedit'][section].keys()):
+                    value = self.mainmetadata_dict['postedit'][section][wavfile]
                     audiolength.append(value['shape'][0] / value['fs'])
 
                 max_audiolength = np.amax(audiolength)
                 maxlength_dict[section] = str(max_audiolength)
         else:
-            audiolength = []
-            for wavfile, value in self.mainmetadata_dict['postedit'][self.prj_name].items():
-                audiolength.append(value['shape'][0] / value['fs'])
-
-                max_audiolength = np.amax(audiolength)
-                maxlength_dict[wavfile] = str(max_audiolength)
+            for wavfile in sorted(self.mainmetadata_dict['postedit'][self.prj_name].keys()):
+                value = self.mainmetadata_dict['postedit'][self.prj_name][wavfile]
+                maxlength_dict[wavfile] = str(value['shape'][0] / value['fs'])
         
         self.logger.info(maxlength_dict)
         

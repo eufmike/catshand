@@ -9,6 +9,7 @@ import openai
 import opencc
 import tiktoken
 import pickle
+import time
 import multiprocessing as mp
 mp.set_start_method('fork', force=True)
 
@@ -109,7 +110,7 @@ def _speech_to_text(idx, audio_section, opsegdir):
 
 def speech_to_text(audio_sections, sections_times, opsegdir, threads = 1):
     print(threads)
-
+    request_time = [time.time()]
     if threads > 1:
         pbar = tqdm(total=len(sections_times))
         results = []
@@ -121,8 +122,16 @@ def speech_to_text(audio_sections, sections_times, opsegdir, threads = 1):
         # sections = []
         for idx, sections_time in enumerate(sections_times):
             audio_section = audio_sections[idx]
-            pool.apply_async(_speech_to_text, args=(idx, audio_section, opsegdir), callback=pbar_update)
-            # sections.append(section)
+            if len(request_time) < 50:
+                request_time.append(time.time())
+                pool.apply_async(_speech_to_text, args=(idx, audio_section, opsegdir), callback=pbar_update)
+            else:
+                while (time.time() - request_time[0]) < 60:
+                    time.sleep(1)
+                request_time.append(time.time())         
+                pool.apply_async(_speech_to_text, args=(idx, audio_section, opsegdir), callback=pbar_update)
+                # sections.append(section)
+                request_time.pop(0)
         pool.close()
         pool.join()
         
@@ -134,8 +143,17 @@ def speech_to_text(audio_sections, sections_times, opsegdir, threads = 1):
     else:
         transcripts_dict = {}
         for idx, sections_time in tqdm(enumerate(sections_times)):
-            _, text = _speech_to_text(idx, audio_section, opsegdir)
-            transcripts_dict[idx] = text
+            audio_section = audio_sections[idx]
+            if len(request_time) < 50:
+                request_time.append(time.time())
+                _, text = _speech_to_text(idx, audio_section, opsegdir)
+            else:       
+                while (time.time() - request_time[0]) < 60:
+                    time.sleep(1)
+                request_time.append(time.time())  
+                _, text = _speech_to_text(idx, audio_section, opsegdir)
+                transcripts_dict[idx] = text
+                request_time.pop(0)
     
     transcripts = []
 

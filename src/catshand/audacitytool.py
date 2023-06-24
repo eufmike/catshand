@@ -65,8 +65,11 @@ class audacitytool:
 
         if (not hl_dir is None): 
             self.HIGHLIGHTFLD = self.prjpath.joinpath(hl_dir)
-            self.HIGHLIGHTPATH = sorted(self.HIGHLIGHTFLD.glob(f'*.wav'))[0]
-
+            highlightpath_list = sorted(self.HIGHLIGHTFLD.glob(f'*.wav'))
+            if len(highlightpath_list) > 0:
+                self.HIGHLIGHTPATH = sorted(self.HIGHLIGHTFLD.glob(f'*.wav'))[0]
+            else:
+                self.HIGHLIGHTPATH = None
         return
         
     def importrecording(self, importall = False, ipformat = '.wav', 

@@ -120,6 +120,10 @@ All functions of catshand are implemented in the command line. The following sec
     catshand audiosplit -p /path/to/project/Podcast/EP099/ -i /path/to/project/Podcast/EP099/merged -ts 00:02:00 00:04:00 
     ```
 
+### Pre-edit after file splitting (for editing services)
+1. # perform loudness normalization and noise reduction
+    catshand audio2wav -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/00_Raw_wav_prjpre -lr -t 4
+
 ### Post-edit
 1. Run the following command for post-editing. Make sure the material folder is downloaded and placed in the dedicated folder.
     ```shell
@@ -142,4 +146,10 @@ All functions of catshand are implemented in the command line. The following sec
     catshand audacitypipe -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav_merged -s
     # add --skip_highlight to skip adding highlight in preparation
     ```
+
+## with editing service
+### Pre editing
+1. catshand prjinit -d /Users/mikeshih/Documents/Podcast/ -n EP030 -m /Users/mikeshih/Documents/Podcast/material
+2. catshand audio2wav -p /Users/mikeshih/Documents/Podcast/EP030/ -i /Users/mikeshih/Documents/Podcast/EP030/02_To_merge -lr -t 4
+3. catshand trackmerger -p /Users/mikeshih/Documents/Podcast/EP030/  -i /Users/mikeshih/Documents/Podcast/EP030/02_To_merge_wav_manual -s -v 0 0 4
 

@@ -50,9 +50,10 @@ Catshand (Cat's Hand) is a toolbox designed for audio editing and production in 
     setx OPENAI_API_KEY “<yourkey>”
     
     # Mac
-    echo "export OPENAI_API_KEY='yourkey'" >> ~/.zshrc
+    echo "export OPENAI_API_KEY='<yourkey>'" >> ~/.zshrc
     ```
-
+10. Launch Audacity. Change the setting of Modules to "Enabled".
+    ![Audacity_Settings](src/catshand/fig/audacity_preference.png)
 
 ## Audio Editing
 Catshand divides editing steps into two parts: pre-edit and post-edit. Pre-edit is the preparation process of raw audio files so they are ready for manual editing to remove filler words or undesirable phrases. Post-edit is the process of editing the finalized audio files and applying compressors and music, to make them ready for publishing.
@@ -157,4 +158,12 @@ All functions of catshand are implemented in the command line. The following sec
 4. Create transcriptions
     ```shell
     catshand prjsummary -p /path/to/project/Podcast/EP099/ -i /path/to/project/Podcast/EP099/09_export_tran -o /path/to/project/Podcast/EP099/09_export_tran -t 4
+    ```
+5. Get highlight
+    ```shell
+    catshand audio2wav -p /path/to/project/Podcast/EP099/ -i /path/to/project/Podcast/EP099/05_Highlight -l
+    ```
+6. Load all into Audacity
+    ```shell
+    catshand audacitypipe -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav_merged -s
     ```

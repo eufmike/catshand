@@ -35,7 +35,8 @@ class postproc:
 
         if not single_track:
             self.namelistorder = self.prjconfig['hosts'] + self.prjconfig['guests']
-            self.folderlist = [x.name for x in sorted(ip_path.iterdir())]
+            self.folderlist = [x.name for x in sorted(ip_path.iterdir()) if x.name != '.DS_Store']
+            self.logger.info(f'folderlist_new: {self.folderlist}')
         else:
             self.namelistorder = [self.prj_name]
             self.folderlist = ['xxxx']
@@ -196,7 +197,7 @@ class postproc:
         if not single_track:
             for section in self.folderlist:    
                 audiolength = []
-                for wavfile, value in sorted(self.mainmetadata_dict['postedit'][section].keys()):
+                for wavfile in sorted(self.mainmetadata_dict['postedit'][section].keys()):
                     value = self.mainmetadata_dict['postedit'][section][wavfile]
                     audiolength.append(value['shape'][0] / value['fs'])
 

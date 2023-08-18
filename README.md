@@ -67,6 +67,8 @@ All functions of catshand are implemented in the command line. The following sec
     catshand prjinit -d <root_dir> -n <project_name> -m <material_dir>
     # example
     catshand prjinit -d /path/to/project/Podcast/ -n EP099 -m /path/to/project/Podcast/material
+    # or
+    catshand prjinit -d $PWD -n EP099 -m $PWD/material
     ```
     Answer the questions in the terminal. The project folder will be created in the root directory of catshand. The project folder will contain the following files:
 3. Download audio files from Google Drive to the project folder. The folder name should be "00_Raw"
@@ -98,33 +100,6 @@ All functions of catshand are implemented in the command line. The following sec
     
     # split audio files
     catshand audiosplit -p /path/to/project/Podcast/EP099/ -i /path/to/project/Podcast/EP099/merged -ts 00:02:00 00:04:00 
-    ```
-
-### Pre-edit after file splitting (for editing services)
-1. # perform loudness normalization and noise reduction
-    catshand audio2wav -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/00_Raw_wav_prjpre -lr -t 4
-
-### Post-edit
-1. Run the following command for post-editing. Make sure the material folder is downloaded and placed in the dedicated folder.
-    ```shell
-    # convert wav and perform the loudness normalization
-    catshand audio2wav -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02 -l -t 4
-    
-    # merge audio files from each sessions to a single track
-    # multi-track
-    catshand audmerger -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav -t 4
-    # single-track
-    catshand audmerger -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav -t 4 -s
-
-    # convert highlight audio to wav with loudness normalization
-    catshand audio2wav -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/05_Highlight -l
-    
-    # Load to Audacity
-    # multi-track
-    catshand audacitypipe -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav_merged
-    # single-track
-    catshand audacitypipe -p /path/to/project/Podcast/EP099 -i /path/to/project/Podcast/EP099/03_Editing_02_wav_merged -s
-    # add --skip_highlight to skip adding highlight in preparation
     ```
 
 ## with editing service

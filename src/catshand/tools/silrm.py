@@ -52,7 +52,7 @@ def segment2array(ipfilelist, maxlength, nonsilence_dict, buffer = 10):
 
         array_nosilence = np.max(array_nosilence, axis=0)
         return array_nosilence
-
+ 
 def _detect_no_silence(ipfile, value, min_silence_len, silence_thresh, logger):
     ipaudio = value['audio']
     logger.info(f'Start detecting non-silence segments in{ipfile}')
@@ -208,7 +208,7 @@ def silrm(args):
     # plt.show()
 
     # print(np.mean(list_silence_len))
-    random_silence = np.random.randint(10, 400, size=len(list_nosilence)-1)
+    random_silence = np.random.randint(10, 200, size=len(list_nosilence)-1)
     remove_silence(ipaudio_dict, list_nosilence, random_silence, bitrate, threads, logger)
 
     return

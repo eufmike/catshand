@@ -31,6 +31,7 @@ def matchname_opfilelist(ipfilelist, prjdir, logger):
     guests = config['guests']
     name_dict = {}
     hostname_options = []
+    guestname_options = []
     for host in hosts:
         for name_option in host_dict[host]:
             name_dict[name_option] = host
@@ -38,7 +39,9 @@ def matchname_opfilelist(ipfilelist, prjdir, logger):
 
     for guest in guests:
         name_dict[guest] = guest
-    names = hostname_options + guests
+        guestname_options.append(guest)
+    names = hostname_options + guestname_options
+    print(names)
 
     opfilelist_names_new = []
     for ipfilelist_name in ipfilelist_names:

@@ -74,8 +74,17 @@ class postproc:
             if not single_track:
                 for section in self.folderlist:
                     self.metadata_dict[section] = {}
-                    wavfilelist = [self.ipfilelist_dict[x][section][0] for x in self.namelistorder]
-                    
+                    print(section)
+                    print(self.ipfilelist_dict)
+                    print(self.namelistorder)
+                    wavfilelist = []
+                    # wavfilelist = [self.ipfilelist_dict[x][section][0] for x in self.namelistorder]
+                    for name in self.namelistorder:
+                        print(name)
+                        wavfilelist_tmp = self.ipfilelist_dict[name][section][0]
+                        print(wavfilelist_tmp)
+                        wavfilelist.append(wavfilelist_tmp)
+                    print(wavfilelist)
                     for wavfile in wavfilelist:
                         fs, data = read(wavfile)
                         self.metadata_dict[section][wavfile.name] = {

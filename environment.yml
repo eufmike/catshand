@@ -15,6 +15,7 @@ dependencies:
   - lxml=5.1.0
   - dash=2.16.0
   - tiktoken=0.6.0
+  - ffmpeg=6.1.1
   - pip:
     - OpenCC
     - noisereduce

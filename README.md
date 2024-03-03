@@ -24,20 +24,15 @@ Catshand (Cat's Hand) is a toolbox designed for audio editing and production in 
 5. Install dependency
    
     ```shell
-    pip install -r ./requirement_core.txt # for Mac User    
+    wget -O /tmp/environment.yml https://raw.githubusercontent.com/eufmike/catshand/main/environment.yml | conda env update -f /tmp/environment.yml -y # for Mac User
     pip install -r ./requirement_win.txt # for Windows User
     ```
 
-6. Install ffmpeg
-    
-    ```shell
-    conda install -c conda-forge ffmpeg -y
-    ```
-
-7. Installation
+6. Installation
 
     ```shell
     pip install -e .
+    pip install git+https://github.com/eufmike/catshand.git
     ```
 
 8. Download demo files from this [link](https://drive.google.com/drive/folders/18VaKpXfOgM0KQbxOm8sdr8dGdOJpBT3t?usp=share_link)

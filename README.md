@@ -25,7 +25,7 @@ Catshand (Cat's Hand) is a toolbox designed for audio editing and production in 
    
     ```shell
     wget -O /tmp/environment.yml https://raw.githubusercontent.com/eufmike/catshand/main/environment.yml | conda env update -f /tmp/environment.yml -y # for Mac User
-    pip install -r ./requirement_win.txt # for Windows User
+    wget -O /tmp/environment.yml https://raw.githubusercontent.com/eufmike/catshand/main/environment_win.yml | conda env update -f /tmp/environment.yml -y # for Win User
     ```
 
 6. Installation

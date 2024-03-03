@@ -8,7 +8,7 @@ argon2-cffi==21.3.0
 argon2-cffi-bindings==21.2.0
 asttokens==2.0.5
 async-timeout==4.0.2
-attrs==21.4.0
+attrs==22.2.0
 audioread==2.1.9
 Babel==2.10.3
 backcall==0.2.0
@@ -48,13 +48,7 @@ jedi==0.18.1
 Jinja2==3.1.2
 joblib==1.1.0
 json5==0.9.8
-jsonschema==4.6.0
-jupyter-client==7.3.4
-jupyter-core==4.10.0
-jupyter-server==1.17.1
-jupyterlab==3.4.3
-jupyterlab-pygments==0.2.2
-jupyterlab-server==2.14.0
+jupyterlab==4.1.2
 kiwisolver==1.4.3
 Levenshtein==0.20.9
 librosa==0.9.1
@@ -75,7 +69,7 @@ notebook==6.4.12
 notebook-shim==0.1.0
 numba==0.55.2
 numpy==1.22.4
-openai==0.27.0
+openai==1.13.3
 OpenCC==1.1.6
 packaging==21.3
 pandas==1.4.2

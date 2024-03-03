@@ -1,0 +1,23 @@
+name: catshand03
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - jupyterlab
+  - matplotlib
+  - numpy
+  - pandas
+  - openai
+  - librosa
+  - click
+  - fuzzywuzzy
+  - pydub
+  - tqdm
+  - lxml
+  - dash
+  - ticktoken
+  - pip:
+    - OpenCC
+    - noisereduce
+    - fake_useragent
+

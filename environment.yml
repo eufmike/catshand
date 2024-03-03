@@ -16,7 +16,6 @@ dependencies:
   - dash=2.16.0
   - tiktoken=0.6.0
   - ffmpeg=6.1.1
-  - pip-tools=7.4.0
   - pip:
     - OpenCC
     - noisereduce

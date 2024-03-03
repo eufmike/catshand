@@ -7,7 +7,7 @@ where = ["src"]
 
 [project]
 name = "catshand"
-version = "0.3.3"
+version = "0.3.4"
 description = "Tools for Podcast editing"
 readme = "README.md"
 authors = [
@@ -42,7 +42,7 @@ dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
 
 
 [tool.bumpver]
-current_version = "0.3.3"
+current_version = "0.3.4"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "Bump version {old_version} -> {new_version}"
 commit          = true
@@ -52,8 +52,4 @@ push            = false
 [tool.bumpver.file_patterns]
 "pyproject.toml" = ['current_version = "{version}"', 'version = "{version}"']
 "src/catshand/__init__.py" = ["{version}"]
-"README.md" = [
-    "{version}",
-    "{pep440_version}",
-]
 

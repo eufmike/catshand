@@ -11,7 +11,7 @@ Catshand (Cat's Hand) is a toolbox designed for audio editing and production in 
 3. create conda environment
 
     ```shell
-    conda create -n catshand -c conda-forge python=3.9 mamba
+    conda create -n catshand -c conda-forge python=3.9 mamba -y
     ## catshand can be replaced by your-own-env-name
     ```
 
@@ -24,8 +24,8 @@ Catshand (Cat's Hand) is a toolbox designed for audio editing and production in 
 5. Install dependency
    
     ```shell
-    wget -O /tmp/environment.yml https://raw.githubusercontent.com/eufmike/catshand/main/environment.yml | conda env update -f /tmp/environment.yml -y # for Mac User
-    wget -O /tmp/environment.yml https://raw.githubusercontent.com/eufmike/catshand/main/environment_win.yml | conda env update -f /tmp/environment.yml -y # for Win User
+    wget -O /tmp/environment.yml https://raw.githubusercontent.com/eufmike/catshand/main/environment.yml | conda env update -f /tmp/environment.yml # for Mac User
+    wget -O /tmp/environment.yml https://raw.githubusercontent.com/eufmike/catshand/main/environment_win.yml | conda env update -f /tmp/environment.yml # for Win User
     ```
 
 6. Installation

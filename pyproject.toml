@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [tool.pdm]
 package-dir = "src"
 
@@ -22,7 +26,7 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "numpy",
+    "numpy", "jupyterlab", "librosa", "pydub", "pandas", "matplotlib", "tqdm", "click", "OpenCC"
 ]
 license = {text = "BSD 2-clause"}
 
@@ -31,7 +35,3 @@ Homepage = "https://github.com/eufmike/catshand"
 
 [project.scripts]
 catshand = "catshand.main:main"
-
-[build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"

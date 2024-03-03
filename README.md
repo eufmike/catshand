@@ -11,7 +11,7 @@ Catshand (Cat's Hand) is a toolbox designed for audio editing and production in 
 3. create conda environment
 
     ```shell
-    conda create -n catshand python=3.9
+    conda create -n catshand -c conda-forge python=3.9 mamba
     ## catshand can be replaced by your-own-env-name
     ```
 

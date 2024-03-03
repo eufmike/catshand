@@ -15,7 +15,7 @@ dependencies:
   - tqdm
   - lxml
   - dash
-  - ticktoken
+  - tiktoken
   - pip:
     - OpenCC
     - noisereduce

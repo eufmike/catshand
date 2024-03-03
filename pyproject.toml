@@ -7,7 +7,7 @@ where = ["src"]
 
 [project]
 name = "catshand"
-version = "0.3.4"
+version = "0.3.5"
 description = "Tools for Podcast editing"
 readme = "README.md"
 authors = [
@@ -42,7 +42,7 @@ dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
 
 
 [tool.bumpver]
-current_version = "0.3.4"
+current_version = "0.3.5"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "Bump version {old_version} -> {new_version}"
 commit          = true

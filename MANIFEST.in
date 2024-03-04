@@ -1,0 +1,3 @@
+include src/catshand/config/*.json
+include src/catshand/doc/*.md
+include src/catshand/fig/*.png

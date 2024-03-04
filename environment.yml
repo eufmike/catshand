@@ -6,7 +6,7 @@ dependencies:
   - matplotlib=3.8.3
   - numpy=1.26.4
   - pandas=2.2.1
-  - openai=1.13.1
+  - openai=1.13.3
   - librosa=0.10.0
   - click=8.1.3
   - fuzzywuzzy=0.18.0

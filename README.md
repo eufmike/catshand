@@ -24,7 +24,10 @@ Catshand (Cat's Hand) is a toolbox designed for audio editing and production in 
 5. Installation
 
     ```shell
+    # for Mac users
     pip install catshand
+    # for Windows users
+    pip install "catshand[win]"
     ```
 
 6. Download demo files from this [link](https://drive.google.com/drive/folders/18VaKpXfOgM0KQbxOm8sdr8dGdOJpBT3t?usp=share_link)

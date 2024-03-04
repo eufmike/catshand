@@ -42,7 +42,8 @@ dependencies = [
     "OpenCC==1.1.7",
     "noisereduce==2.0.1",
     "fake_useragent>=1.4.0", 
-    "dash_bootstrap_components==1.4.1"
+    "dash_bootstrap_components==1.4.1", 
+    "python-Levenshtein==0.25.0"
 ]
 license = {text = "BSD 2-clause"}
 

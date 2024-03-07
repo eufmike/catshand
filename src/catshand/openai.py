@@ -41,10 +41,9 @@ def import_audio_file(file_path):
 
 def section_audio(idx, audio, sections_time, opsegdir, tmpdir, sections_length_digit):
     section = audio[sections_time[0] : sections_time[1]]
-    section.export(
-        opsegdir.joinpath(f"s_{idx:0{sections_length_digit}}.wav"), format="wav"
-    )
-    return (idx, section)
+    segoppath = opsegdir.joinpath(f"s_{idx:0{sections_length_digit}}.wav")
+    section.export(segoppath, format="wav")
+    return (idx, section, segoppath)
 
 
 def separate_sentences(
@@ -98,19 +97,27 @@ def separate_sentences(
         pool.join()
 
         sections = {}
+        sec_loudness = {}
+        sec_oppaths = {}
         for value in results:
-            idx, section = value
+            idx, section, sec_oppath = value
             sections[idx] = section
-
+            sec_loudness[idx] = section.dBFS
+            sec_oppaths[idx] = sec_oppath
     else:
         sections = {}
+        sec_loudness = {}
+        sec_oppaths = {}
+        print(sections_times[0])
         for idx, sections_time in tqdm(enumerate(sections_times)):
-            _, section = section_audio(
+            _, section, sec_oppath = section_audio(
                 idx, audio, sections_time, opsegdir, tmpdir, sections_length_digit
             )
             sections[idx] = section
+            sec_loudness[idx] = section.dBFS
+            sec_oppaths[idx] = sec_oppath
 
-    return sections, sections_times
+    return sections, sections_times, sec_oppaths, sec_loudness
 
 
 def _speech_to_text(idx, audio_section, opsegdir):
@@ -118,13 +125,16 @@ def _speech_to_text(idx, audio_section, opsegdir):
     temp_file = Path(opsegdir, f"temp_section_{idx}.wav")
     audio_section.export(temp_file, format="wav")
     audio_section = audio_section.set_frame_rate(16000)
+    print(audio_section.dBFS)
+    print(audio_section.duration_seconds)
     # Load the WAV file and convert to base64
     with open(temp_file, "rb") as f:
         # Perform speech-to-text using the OpenAI API
         try:
             # initial_prompt = "Transcribe this audio to tranditional Chinese and English. pause fillers/filled pauses and particles should be in Chinese."
             # initial_prompt = "本音檔是一個討論生物醫學研究、在美生活、求學生涯以及心理健康的對話。將本音檔產生繁體中# 文的逐字稿，音檔中的贅詞、填詞和語助詞應該用繁體中文表示。只有關鍵詞、人名以及專有名詞用英文表示。逐字稿不應# 該包含英文、繁體中文以外的字。少於兩秒的音檔只產生繁體中文。Hmm替代為嗯。"
-            prompt = "This audio discusses biomedical research, experience in living abroad, and mental health. Please cerate a transcript of this audio mainly in traditional Chinese, only transcribe names, professional terms in both Traditional Chinese and English. Particals and filled pauses should be transcribed in Traditional Chinese. For example, Hmm should be replaced by 嗯."
+            # prompt = "This audio discusses biomedical research, experience in living abroad, and mental health. Please create a transcript of this audio mainly in traditional Chinese, only transcribe names, professional terms in both Traditional Chinese and English. Particals and filled pauses should be transcribed in Traditional Chinese. For example, Hmm should be replaced by 嗯."
+            prompt = "This audio discusses biomedical research, experience in living abroad, and mental health. Please create a transcript of this audio mainly in traditional Chinese, only transcribe professional terms in both Traditional Chinese and English."
             # response = openai.Audio.transcribe("whisper-1", f, initial_prompt=initial_prompt)
             response = client.audio.transcriptions.create(
                 model="whisper-1", file=f, prompt=prompt
@@ -208,11 +218,19 @@ def speech_to_text(audio_sections, sections_times, opsegdir, threads=1):
     return transcripts
 
 
-def export_to_csv(times, transcripts, output_file="output.csv"):
+def export_to_csv(
+    times, transcripts, sec_oppaths, sec_loudness, output_file="output.csv"
+):
     # df = pd.DataFrame(columns=['start_time', 'end_time', 'transcript'])
     df = []
     for i, (start, end) in tqdm(enumerate(times)):
-        tmp = {"start_time": start, "end_time": end, "transcript": transcripts[i]}
+        tmp = {
+            "start_time": start,
+            "end_time": end,
+            "transcript": transcripts[i],
+            "audiofile": sec_oppaths[i],
+            "loudness": sec_loudness[i],
+        }
         df_tmp = pd.DataFrame(tmp, index=[i])
         df.append(df_tmp)
     df = pd.concat(df, axis=0, ignore_index=True)
@@ -230,7 +248,7 @@ def process_audio_file(
 ):
     tmpdir.mkdir(parents=True, exist_ok=True)
     audio = import_audio_file(file_path)
-    sections, sections_times = separate_sentences(
+    sections, sections_times, sec_oppaths, sec_loudness = separate_sentences(
         audio,
         opsegdir,
         tmpdir,
@@ -239,7 +257,7 @@ def process_audio_file(
         threads=threads,
     )
     transcripts = speech_to_text(sections, sections_times, opsegdir, threads=threads)
-    export_to_csv(sections_times, transcripts, output_file)
+    export_to_csv(sections_times, transcripts, sec_oppaths, sec_loudness, output_file)
 
 
 # ==========================

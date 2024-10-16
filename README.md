@@ -1,5 +1,7 @@
 # Catshand (Cat's Hand)
 
+Current Audacity support: 3.6.1
+
 Catshand (Cat's Hand) is a toolbox designed for audio editing and production in the team of Tripod Cat's Podcast. Catshand is named after the Japanese idiom "猫の手も借りたい", which means "so busy someone wants to borrow even the paw of a cat." It simplifies the audio editing process by automating repetitive tasks and integrating with the popular editing tool Audacity. Catshand provides OpenAI-powered transcription and content summary, so users can focus on the creative process, rather than spending time on content searching.  
 
 ![catshand_with_Audacity](./src/catshand/fig/screen_02.png)

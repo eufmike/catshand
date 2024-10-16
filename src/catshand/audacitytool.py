@@ -266,7 +266,6 @@ class audacitytool:
             print(self.MIDDLE_TIMESTAMP)
 
             trackamount = len(getinfo2json())
-            trackamount = 2
             for idx in range(trackamount):
                 trackinfo = getinfo2json()[idx]
                 trackend = trackinfo["end"]
@@ -276,11 +275,6 @@ class audacitytool:
                     f'SelectTime: Start="{self.TRACK_OFFSET + self.MIDDLE_TIMESTAMP + cumulative}" End="{self.TRACK_OFFSET + trackend}"'
                 )
                 do_command(f"SplitCut:")
-                print(self.TRACK_OFFSET)
-                print(self.MIDDLE_TIMESTAMP)
-                print(cumulative)
-                print(silence)
-                print(music_offset)
                 paste_time = (
                     self.TRACK_OFFSET
                     + self.MIDDLE_TIMESTAMP
@@ -291,13 +285,10 @@ class audacitytool:
                 print(f"paste_time:{paste_time}")
                 do_command(f'SelectTime: Start="{paste_time}" End="{paste_time}"')
                 do_command(f"Paste:")
-                # if idx < 1:
-                # break
 
             cumulative += silence + music_offset
             print(f"cumulative:{cumulative}")
-            break
-        """
+
         # add music
         cumulative = 0
         for index, row in self.dfaddmusic.iterrows():
@@ -334,7 +325,6 @@ class audacitytool:
 
             do_command("Enter:")
             cumulative += silence + music_offset
-        """
         return
 
     def addmusic(self, default_music):

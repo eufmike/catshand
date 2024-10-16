@@ -7,7 +7,7 @@ import sys
 import time
 from pathlib import Path
 
-import openai
+# import openai
 import opencc
 import pandas as pd
 import tiktoken

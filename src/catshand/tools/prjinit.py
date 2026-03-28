@@ -1,4 +1,3 @@
-import argparse
 import json
 from pathlib import Path
 
@@ -7,17 +6,19 @@ import click
 from catshand.utility import configgen, loggergen
 
 
-def prjinit(args):
-    # def prjinit(args):
-    #     print(args)
-    rootdir = args.root_dir
-    prj_n = args.project_name
+def main(rootdir, prj_n, mat_dir=None):
+    """Business logic for project initialization; callable without CLI parsing."""
+    rootdir = Path(rootdir)
     prjdir = Path(rootdir, prj_n)
-    mat_dir = args.material_dir
     if mat_dir is not None:
         mat_dir = Path(mat_dir)
     else:
         mat_dir = prjdir.joinpath("material")
+    _run(prjdir=prjdir, mat_dir=mat_dir)
+
+
+def _run(prjdir, mat_dir):
+    """Internal implementation."""
 
     if prjdir.is_dir():
         if not click.confirm(f"Project folder already exists, Continue?", default=True):
@@ -81,6 +82,11 @@ def prjinit(args):
     return
 
 
+def _legacy_argparse_entry(args):
+    """Argparse callback for legacy main.py entry point."""
+    main(rootdir=args.root_dir, prj_n=args.project_name, mat_dir=args.material_dir)
+
+
 def add_subparser(subparsers):
     description = "prjinit creates the project folder"
     subparsers = subparsers.add_parser("prjinit", help=description)
@@ -103,5 +109,5 @@ def add_subparser(subparsers):
     optional_group.add_argument(
         "-m", "--material_dir", type=str, help="directory for the material folder"
     )
-    subparsers.set_defaults(func=prjinit)
+    subparsers.set_defaults(func=_legacy_argparse_entry)
     return

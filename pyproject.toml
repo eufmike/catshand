@@ -7,7 +7,7 @@ where = ["src"]
 
 [project]
 name = "catshand"
-version = "0.3.6"
+version = "0.4.0"
 description = "Tools for Podcast editing"
 readme = "README.md"
 authors = [
@@ -74,7 +74,7 @@ dev = [
 win = ["pywin32", "pywinpty"]
 
 [tool.bumpver]
-current_version = "0.3.6"
+current_version = "0.4.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "Bump version {old_version} -> {new_version}"
 commit          = true

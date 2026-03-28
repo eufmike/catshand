@@ -1,0 +1,57 @@
+[project]
+name = "catshand"
+version = "0.4.0"
+description = "Tools for Podcast editing"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "osx-64", "linux-64"]
+
+[dependencies]
+python = ">=3.11"
+numpy = ">=1.26.4"
+pandas = ">=2.2.1"
+librosa = ">=0.10.0"
+pydub = ">=0.25.1"
+tqdm = ">=4.66"
+lxml = ">=5.1.0"
+dask = ">=2024.1.0"
+
+[pypi-dependencies]
+catshand = { path = ".", editable = true }
+typer = ">=0.12"
+pydantic = ">=2.0"
+openai = ">=1.13.3"
+tiktoken = ">=0.6.0"
+noisereduce = "==2.0.1"
+fuzzywuzzy = ">=0.18.0"
+python-Levenshtein = "==0.25.0"
+fake-useragent = ">=1.4.0"
+OpenCC = "==1.1.7"
+dash = ">=2.16.0"
+dash-bootstrap-components = "==1.4.1"
+matplotlib = ">=3.8.3"
+
+[feature.dev.pypi-dependencies]
+ruff = "*"
+mypy = "*"
+pytest = ">=8.0"
+pytest-cov = "*"
+pytest-env = "*"
+pre-commit = "*"
+pandas-stubs = "*"
+docstr-coverage = "*"
+bumpver = "*"
+Sphinx = "*"
+furo = "*"
+sphinx-autoapi = "*"
+myst-parser = "*"
+
+[environments]
+default = { features = [], solve-group = "default" }
+dev = { features = ["dev"], solve-group = "default" }
+
+[tasks]
+test = "pytest tests/"
+lint = "ruff check src/"
+fmt = "ruff format src/"
+typecheck = "mypy src/"
+build = "python -m build"
